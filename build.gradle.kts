@@ -5,6 +5,7 @@ plugins {
   java
   application
   id("com.github.johnrengelman.shadow") version "7.0.0"
+  id("org.flywaydb.flyway") version "7.14.0"
 }
 
 group = "com.example"
@@ -43,6 +44,10 @@ dependencies {
   implementation("io.vertx:vertx-service-proxy:$vertxVersion")
   implementation("org.slf4j:slf4j-api:$slf4jVersion")
   implementation("ch.qos.logback:logback-classic:$logbackVersion")
+
+//  "Only for migrations"
+  compileOnly("org.postgresql:postgresql:42.2.23")
+
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
@@ -54,6 +59,12 @@ dependencies {
 java {
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
+}
+
+flyway {
+  url = "jdbc:postgresql://localhost:5432/fra_pizza"
+  user = "postgres"
+  password = "postgres"
 }
 
 tasks.withType<ShadowJar> {
