@@ -1,44 +1,16 @@
 package com.example.frapizza.entity;
 
-import org.hibernate.annotations.NaturalId;
-
-import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "users")
 public class User {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @NaturalId(mutable = true)
-  @Column(nullable = false)
-  private String email;
-
-  @Column(name = "first_name", nullable = false)
   private String firstName;
-
-  @Column(name = "last_name", nullable = false)
   private String lastName;
-
-  @Column(nullable = false)
+  private String email;
   private String password;
-
-  @Column(name = "phone_number")
   private String phoneNumber;
-
-  @Column(name = "created_at", nullable = false)
   private OffsetDateTime createdAt;
-
-  @OneToMany(mappedBy = "createdBy")
-  private List<Pizza> pizzas;
-
-  @OneToMany(mappedBy = "user")
-  private List<Delivery> deliveries;
 
   public Long getId() {
     return id;
@@ -94,22 +66,6 @@ public class User {
 
   public void setCreatedAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
-  }
-
-  public List<Pizza> getPizzas() {
-    return pizzas;
-  }
-
-  public void setPizzas(List<Pizza> pizzas) {
-    this.pizzas = pizzas;
-  }
-
-  public List<Delivery> getDeliveries() {
-    return deliveries;
-  }
-
-  public void setDeliveries(List<Delivery> deliveries) {
-    this.deliveries = deliveries;
   }
 
   @Override

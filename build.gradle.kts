@@ -37,13 +37,14 @@ dependencies {
   implementation("io.vertx:vertx-web-client")
   implementation("io.vertx:vertx-web")
   implementation("io.vertx:vertx-pg-client")
-  implementation("org.hibernate.reactive:hibernate-reactive-core:$hibernateReactVersion")
   implementation("org.flywaydb:flyway-core:$flywayVersion")
   implementation("io.vertx:vertx-rx-java3")
   implementation("io.vertx:vertx-codegen:$vertxVersion")
   implementation("io.vertx:vertx-service-proxy:$vertxVersion")
   implementation("org.slf4j:slf4j-api:$slf4jVersion")
   implementation("ch.qos.logback:logback-classic:$logbackVersion")
+  implementation("io.vertx:vertx-config")
+  implementation("io.vertx:vertx-web-sstore-redis:$vertxVersion")
 
 //  "Only for migrations"
   compileOnly("org.postgresql:postgresql:42.2.23")

@@ -1,38 +1,13 @@
 package com.example.frapizza.entity;
 
-import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-@Entity
-@Table(name = "pizzas")
 public class Pizza {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Column(nullable = false)
   private String name;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
   private User createdBy;
-
-  @Column(name = "created_at")
   private OffsetDateTime createdAt;
-
-  @ManyToMany
-  @JoinTable(
-    name = "pizza_ingredients",
-    joinColumns = @JoinColumn(name = "pizza_id", referencedColumnName = "id"),
-    inverseJoinColumns = @JoinColumn(name = "ingredient_id", referencedColumnName = "id"))
-  private Set<Ingredient> ingredients;
-
-  @OneToMany(mappedBy = "pizza")
-  private List<Order> orders;
 
   public Long getId() {
     return id;
@@ -64,27 +39,6 @@ public class Pizza {
 
   public void setCreatedAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
-  }
-
-  public Set<Ingredient> getIngredients() {
-    return ingredients;
-  }
-
-  public void setIngredients(Set<Ingredient> ingredients) {
-    this.ingredients = ingredients;
-  }
-
-  public void addIngredient(Ingredient ingredient){
-    ingredients.add(ingredient);
-    ingredient.getPizzas().add(this);
-  }
-
-  public List<Order> getOrders() {
-    return orders;
-  }
-
-  public void setOrders(List<Order> orders) {
-    this.orders = orders;
   }
 
   @Override

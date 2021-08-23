@@ -1,29 +1,12 @@
 package com.example.frapizza.entity;
 
-import org.hibernate.annotations.NaturalId;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.Set;
 
-@Entity
-@Table(name = "ingredients")
 public class Ingredient {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-
-  @NaturalId
-  @Column(nullable = false)
   private String name;
-
-  @Column(nullable = false)
   private BigDecimal cost;
-
-  @ManyToMany(mappedBy = "ingredients")
-  private Set<Pizza> pizzas;
 
   public Integer getId() {
     return id;
@@ -47,14 +30,6 @@ public class Ingredient {
 
   public void setCost(BigDecimal cost) {
     this.cost = cost;
-  }
-
-  public Set<Pizza> getPizzas() {
-    return pizzas;
-  }
-
-  public void setPizzas(Set<Pizza> pizzas) {
-    this.pizzas = pizzas;
   }
 
   @Override

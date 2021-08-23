@@ -1,20 +1,46 @@
 package com.example.frapizza.entity;
 
-import javax.persistence.*;
+import java.util.Objects;
 
-@Entity
-@Table(name = "orders")
 public class Order {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "delivery_id")
   private Delivery delivery;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "pizza_id")
   private Pizza pizza;
 
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Delivery getDelivery() {
+    return delivery;
+  }
+
+  public void setDelivery(Delivery delivery) {
+    this.delivery = delivery;
+  }
+
+  public Pizza getPizza() {
+    return pizza;
+  }
+
+  public void setPizza(Pizza pizza) {
+    this.pizza = pizza;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Order order = (Order) o;
+    return id.equals(order.id) && delivery.equals(order.delivery) && pizza.equals(order.pizza);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, delivery, pizza);
+  }
 }

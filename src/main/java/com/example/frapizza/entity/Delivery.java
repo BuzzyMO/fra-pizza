@@ -1,42 +1,18 @@
 package com.example.frapizza.entity;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Time;
-import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "deliveries")
 public class Delivery {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
   private User user;
-
-  @Column(nullable = false)
   private String city;
-
-  @Column(nullable = false)
   private String street;
-
-  @Column(nullable = false)
   private String building;
-
   private String apartment;
-
-  @Column(nullable = false)
   private Time expTime;
-
-  @Column(nullable = false)
   private BigDecimal cost;
-
-  @OneToMany(mappedBy = "delivery")
-  private List<Order> orders;
 
   public Long getId() {
     return id;
@@ -100,14 +76,6 @@ public class Delivery {
 
   public void setCost(BigDecimal cost) {
     this.cost = cost;
-  }
-
-  public List<Order> getOrders() {
-    return orders;
-  }
-
-  public void setOrders(List<Order> orders) {
-    this.orders = orders;
   }
 
   @Override
