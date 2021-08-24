@@ -18,7 +18,6 @@ repositories {
 val vertxVersion = "4.1.2"
 val junitJupiterVersion = "5.7.0"
 val logbackVersion = "1.2.3"
-val hibernateReactVersion = "1.0.0.CR9"
 val flywayVersion = "7.14.0"
 val slf4jVersion = "1.7.30"
 
@@ -45,6 +44,7 @@ dependencies {
   implementation("ch.qos.logback:logback-classic:$logbackVersion")
   implementation("io.vertx:vertx-config")
   implementation("io.vertx:vertx-web-sstore-redis:$vertxVersion")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
 
 //  "Only for migrations"
   compileOnly("org.postgresql:postgresql:42.2.23")

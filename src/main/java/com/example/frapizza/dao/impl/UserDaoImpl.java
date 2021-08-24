@@ -23,14 +23,14 @@ public class UserDaoImpl implements UserDao {
     return Future.future(promise -> pool.withTransaction(client -> client
         .preparedQuery(query)
         .execute(Tuple.of(entity.getFirstName(), entity.getLastName(), entity.getEmail(), entity.getPassword(), entity.getPhoneNumber()))
-        .onSuccess(rs -> LOGGER.info("User is created, id: " + entity.getEmail()))
+        .onSuccess(rs -> LOGGER.info("User is created: " + entity.getEmail()))
         .onFailure(ex -> LOGGER.error("User creation failed: " + ex.getMessage())))
       .onSuccess(rs -> {
         LOGGER.info("Transaction succeeded");
         promise.complete();
       })
       .onFailure(ex -> {
-        LOGGER.info("Transaction failed");
+        LOGGER.error("Transaction failed");
         promise.fail(ex);
       }));
   }

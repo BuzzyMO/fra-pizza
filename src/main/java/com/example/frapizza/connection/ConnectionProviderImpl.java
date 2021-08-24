@@ -1,9 +1,6 @@
 package com.example.frapizza.connection;
 
-import io.vertx.config.ConfigRetriever;
-import io.vertx.config.ConfigRetrieverOptions;
-import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.Future;
+import com.example.frapizza.util.ConfigLoader;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
@@ -22,13 +19,7 @@ public class ConnectionProviderImpl implements ConnectionProvider {
 
   @Override
   public PgPool getPool() {
-    JsonObject props = loadEnv()
-      .onSuccess(json -> LOGGER.info("Env is loaded"))
-      .onFailure(ex -> {
-        LOGGER.error("Env loaded is fail: " + ex.getMessage());
-        throw new RuntimeException(ex);
-      })
-      .result();
+    JsonObject props = ConfigLoader.loadEnv(vertx);
 
     int port = Integer.parseInt(props.getString("DATASOURCE_PORT"));
     String host = props.getString("DATASOURCE_HOST");
@@ -47,15 +38,5 @@ public class ConnectionProviderImpl implements ConnectionProvider {
       .setMaxSize(5);
 
     return PgPool.pool(vertx, connectOptions, poolOptions);
-  }
-
-  private Future<JsonObject> loadEnv() {
-    ConfigStoreOptions envStore = new ConfigStoreOptions()
-      .setType("env")
-      .setConfig(new JsonObject().put("raw-data", true));
-    ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-      .addStore(envStore);
-    ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-    return retriever.getConfig();
   }
 }

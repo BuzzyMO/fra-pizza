@@ -4,6 +4,7 @@ import com.example.frapizza.dao.impl.UserDaoImpl;
 import com.example.frapizza.entity.User;
 import com.example.frapizza.service.UserService;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -22,9 +23,15 @@ public class UserServiceImpl implements UserService {
   @Override
   public void save(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
     User user = userJson.mapTo(User.class);
-    resultHandler.handle(userDao.save(user)
-      .onSuccess(r -> LOGGER.info("User is created: " + user.getEmail()))
-      .onFailure(ex -> LOGGER.error("User creation failed: " + user.getId())));
+    userDao.save(user)
+      .onSuccess(r -> {
+        LOGGER.info("User is created: " + user.getEmail());
+        resultHandler.handle(Future.succeededFuture());
+      })
+      .onFailure(ex -> {
+        LOGGER.error("User creation failed: " + user.getEmail());
+        resultHandler.handle(Future.failedFuture(ex));
+      });
   }
 
   @Override

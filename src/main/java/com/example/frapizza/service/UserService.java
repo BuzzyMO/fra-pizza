@@ -1,6 +1,5 @@
 package com.example.frapizza.service;
 
-import com.example.frapizza.dao.impl.UserDaoImpl;
 import com.example.frapizza.service.impl.UserServiceImpl;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
