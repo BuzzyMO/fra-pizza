@@ -1,7 +1,9 @@
 package com.example.frapizza.dao.impl;
 
 import com.example.frapizza.dao.AuthDao;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
@@ -18,10 +20,10 @@ public class AuthDaoImpl implements AuthDao {
   }
 
   @Override
-  public Future<JsonObject> authentication(JsonObject credentials) {
+  public void authentication(JsonObject credentials, Handler<AsyncResult<JsonObject>> resultHandler) {
     String query = "SELECT* FROM users WHERE email=$1 AND password=$2";
 
-    return Future.future(promise -> pool.withTransaction(client -> client
+    pool.withTransaction(client -> client
         .preparedQuery(query)
         .execute(Tuple.of(credentials.getString("username"), credentials.getString("password")))
         .onFailure(ex -> LOGGER.error("User authentication failed: " + ex.getMessage())))
@@ -29,17 +31,17 @@ public class AuthDaoImpl implements AuthDao {
         if(rs.rowCount()<1){
           String errMsg ="Password or email incorrect";
           LOGGER.error(errMsg);
-          promise.fail(errMsg);
+          resultHandler.handle(Future.failedFuture(errMsg));
           return;
         }
         Row row = rs.iterator().next();
         JsonObject json = row.toJson();
         LOGGER.info("Transaction succeeded");
-        promise.complete(json);
+        resultHandler.handle(Future.succeededFuture(json));
       })
       .onFailure(ex -> {
         LOGGER.error("Transaction failed");
-        promise.fail(ex);
-      }));
+        resultHandler.handle(Future.failedFuture(ex));
+      });
   }
 }

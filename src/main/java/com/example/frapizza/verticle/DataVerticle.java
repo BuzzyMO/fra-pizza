@@ -2,8 +2,8 @@ package com.example.frapizza.verticle;
 
 import com.example.frapizza.connection.ConnectionProvider;
 import com.example.frapizza.connection.ConnectionProviderImpl;
-import com.example.frapizza.service.AuthService;
-import com.example.frapizza.service.UserService;
+import com.example.frapizza.dao.AuthDao;
+import com.example.frapizza.dao.UserDao;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.pgclient.PgPool;
 import io.vertx.serviceproxy.ServiceBinder;
@@ -16,11 +16,11 @@ public class DataVerticle extends AbstractVerticle {
     ServiceBinder serviceBinder = new ServiceBinder(vertx);
 
     serviceBinder
-      .setAddress(UserService.ADDRESS)
-      .register(UserService.class, UserService.create(vertx, connectionPool));
+      .setAddress(UserDao.ADDRESS)
+      .register(UserDao.class, UserDao.create(connectionPool));
 
     serviceBinder
-      .setAddress(AuthService.ADDRESS)
-      .register(AuthService.class, AuthService.create(vertx, connectionPool));
+      .setAddress(AuthDao.ADDRESS)
+      .register(AuthDao.class, AuthDao.create(connectionPool));
   }
 }

@@ -7,15 +7,14 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgPool;
 
 @VertxGen
 @ProxyGen
 public interface UserService {
   String ADDRESS = "user.service";
 
-  static UserService create(Vertx vertx, PgPool pool) {
-    return new UserServiceImpl(vertx, pool);
+  static UserService create(Vertx vertx) {
+    return new UserServiceImpl(vertx);
   }
 
   static UserService createProxy(Vertx vertx, String address) {

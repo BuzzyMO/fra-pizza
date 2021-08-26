@@ -43,7 +43,6 @@ import io.vertx.serviceproxy.ServiceBinder;
 
 import com.example.frapizza.service.AuthService;
 import io.vertx.core.Vertx;
-import io.vertx.pgclient.PgPool;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 /*

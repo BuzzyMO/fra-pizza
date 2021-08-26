@@ -78,8 +78,8 @@ public class AuthService {
     return delegate;
   }
 
-  public static com.example.frapizza.rxjava3.service.AuthService create(io.vertx.rxjava3.core.Vertx vertx, io.vertx.rxjava3.pgclient.PgPool pool) { 
-    com.example.frapizza.rxjava3.service.AuthService ret = com.example.frapizza.rxjava3.service.AuthService.newInstance((com.example.frapizza.service.AuthService)com.example.frapizza.service.AuthService.create(vertx.getDelegate(), pool.getDelegate()));
+  public static com.example.frapizza.rxjava3.service.AuthService create(io.vertx.rxjava3.core.Vertx vertx) { 
+    com.example.frapizza.rxjava3.service.AuthService ret = com.example.frapizza.rxjava3.service.AuthService.newInstance((com.example.frapizza.service.AuthService)com.example.frapizza.service.AuthService.create(vertx.getDelegate()));
     return ret;
   }
 

@@ -2,6 +2,7 @@ package com.example.frapizza;
 
 import com.example.frapizza.verticle.HttpVerticle;
 import com.example.frapizza.verticle.DataVerticle;
+import com.example.frapizza.verticle.ServiceVerticle;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Promise;
@@ -15,6 +16,7 @@ public class MainVerticle extends AbstractVerticle {
   public void start(Promise<Void> promise) {
     CompositeFuture.all(
         vertx.deployVerticle(new HttpVerticle()),
+        vertx.deployVerticle(new ServiceVerticle()),
         vertx.deployVerticle(new DataVerticle()))
       .onSuccess(ok -> {
         LOGGER.info("Verticles deployed is successful");

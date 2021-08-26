@@ -78,8 +78,8 @@ public class UserService {
     return delegate;
   }
 
-  public static com.example.frapizza.rxjava3.service.UserService create(io.vertx.rxjava3.core.Vertx vertx, io.vertx.rxjava3.pgclient.PgPool pool) { 
-    com.example.frapizza.rxjava3.service.UserService ret = com.example.frapizza.rxjava3.service.UserService.newInstance((com.example.frapizza.service.UserService)com.example.frapizza.service.UserService.create(vertx.getDelegate(), pool.getDelegate()));
+  public static com.example.frapizza.rxjava3.service.UserService create(io.vertx.rxjava3.core.Vertx vertx) { 
+    com.example.frapizza.rxjava3.service.UserService ret = com.example.frapizza.rxjava3.service.UserService.newInstance((com.example.frapizza.service.UserService)com.example.frapizza.service.UserService.create(vertx.getDelegate()));
     return ret;
   }
 
