@@ -1,7 +1,6 @@
 package com.example.frapizza.verticle;
 
-import com.example.frapizza.handler.AuthHandler;
-import com.example.frapizza.handler.UserHandler;
+import com.example.frapizza.route.*;
 import com.example.frapizza.util.ConfigLoader;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
@@ -35,10 +34,12 @@ public class HttpVerticle extends AbstractVerticle {
     AuthenticationHandler authHandler = AuthHandler.createAuthHandler(vertx);
 
     Router router = Router.router(vertx);
-    router.route().handler(sessionHandler);
-    router.route().handler(authHandler);
-    UserHandler userHandler = new UserHandler(vertx);
-    router.mountSubRouter("/api/user", userHandler.getRouter());
+    router.route().handler(sessionHandler)
+      .handler(authHandler);
+    Router userRouter = UserRouter.create(vertx);
+    Router pizzaRouter = PizzaRouter.create(vertx);
+    router.mountSubRouter("/api/user", userRouter);
+    router.mountSubRouter("/api/pizza", pizzaRouter);
 
     vertx.createHttpServer()
       .requestHandler(router)

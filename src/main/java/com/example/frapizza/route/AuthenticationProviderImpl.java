@@ -1,4 +1,4 @@
-package com.example.frapizza.handler;
+package com.example.frapizza.route;
 
 import com.example.frapizza.service.AuthService;
 import io.vertx.core.AsyncResult;

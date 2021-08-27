@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Pizza {
   private Long id;
   private String name;
-  private User createdBy;
+  private Long createdBy;
   private OffsetDateTime createdAt;
 
   public Long getId() {
@@ -25,11 +25,11 @@ public class Pizza {
     this.name = name;
   }
 
-  public User getCreatedBy() {
+  public Long getCreatedBy() {
     return createdBy;
   }
 
-  public void setCreatedBy(User createdBy) {
+  public void setCreatedBy(Long createdBy) {
     this.createdBy = createdBy;
   }
 
