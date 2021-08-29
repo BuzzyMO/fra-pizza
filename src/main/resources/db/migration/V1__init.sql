@@ -69,8 +69,7 @@ CREATE TABLE deliveries
   building      TEXT  NOT NULL,
   apartment     TEXT,
   distance_m    INT   NOT NULL,
-  exp_time      TIME  NOT NULL,
-  cost          MONEY NOT NULL
+  exp_time      INT   NOT NULL
 );
 
 CREATE TABLE orders

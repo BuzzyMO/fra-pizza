@@ -1,18 +1,17 @@
 package com.example.frapizza.entity;
 
-import java.math.BigDecimal;
-import java.sql.Time;
 import java.util.Objects;
 
 public class Delivery {
   private Long id;
-  private User user;
+  private Long createdBy;
+  private Integer pizzeriaFrom;
   private String city;
   private String street;
   private String building;
   private String apartment;
-  private Time expTime;
-  private BigDecimal cost;
+  private Integer distanceM;
+  private Integer expTime;
 
   public Long getId() {
     return id;
@@ -22,12 +21,20 @@ public class Delivery {
     this.id = id;
   }
 
-  public User getUser() {
-    return user;
+  public Long getCreatedBy() {
+    return createdBy;
   }
 
-  public void setUser(User user) {
-    this.user = user;
+  public void setCreatedBy(Long createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public Integer getPizzeriaFrom() {
+    return pizzeriaFrom;
+  }
+
+  public void setPizzeriaFrom(Integer pizzeriaFrom) {
+    this.pizzeriaFrom = pizzeriaFrom;
   }
 
   public String getCity() {
@@ -62,20 +69,20 @@ public class Delivery {
     this.apartment = apartment;
   }
 
-  public Time getExpTime() {
+  public Integer getDistanceM() {
+    return distanceM;
+  }
+
+  public void setDistanceM(Integer distanceM) {
+    this.distanceM = distanceM;
+  }
+
+  public Integer getExpTime() {
     return expTime;
   }
 
-  public void setExpTime(Time expTime) {
+  public void setExpTime(Integer expTime) {
     this.expTime = expTime;
-  }
-
-  public BigDecimal getCost() {
-    return cost;
-  }
-
-  public void setCost(BigDecimal cost) {
-    this.cost = cost;
   }
 
   @Override
@@ -83,11 +90,11 @@ public class Delivery {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Delivery delivery = (Delivery) o;
-    return user.equals(delivery.user) && city.equals(delivery.city) && street.equals(delivery.street) && building.equals(delivery.building) && Objects.equals(apartment, delivery.apartment) && expTime.equals(delivery.expTime);
+    return createdBy.equals(delivery.createdBy) && city.equals(delivery.city) && street.equals(delivery.street) && building.equals(delivery.building) && Objects.equals(apartment, delivery.apartment) && expTime.equals(delivery.expTime);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(user, city, street, building, apartment, expTime);
+    return Objects.hash(createdBy, city, street, building, apartment, expTime);
   }
 }

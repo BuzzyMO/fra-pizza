@@ -4,6 +4,7 @@ import com.example.frapizza.connection.ConnectionProvider;
 import com.example.frapizza.connection.ConnectionProviderImpl;
 import com.example.frapizza.dao.AuthDao;
 import com.example.frapizza.dao.PizzaDao;
+import com.example.frapizza.dao.PizzeriaDao;
 import com.example.frapizza.dao.UserDao;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.pgclient.PgPool;
@@ -27,5 +28,9 @@ public class DataVerticle extends AbstractVerticle {
     serviceBinder
       .setAddress(PizzaDao.ADDRESS)
       .register(PizzaDao.class, PizzaDao.create(connectionPool));
+
+    serviceBinder
+      .setAddress(PizzeriaDao.ADDRESS)
+      .register(PizzeriaDao.class, PizzeriaDao.create(connectionPool));
   }
 }
