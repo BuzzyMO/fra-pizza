@@ -1,5 +1,7 @@
 package com.example.frapizza.entity;
 
+import io.vertx.core.json.JsonObject;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -30,6 +32,10 @@ public class Ingredient {
 
   public void setCost(BigDecimal cost) {
     this.cost = cost;
+  }
+
+  public JsonObject toJson(){
+    return JsonObject.mapFrom(this);
   }
 
   @Override

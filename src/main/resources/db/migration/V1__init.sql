@@ -31,7 +31,7 @@ CREATE TABLE ingredients
 (
   id   SERIAL PRIMARY KEY,
   name TEXT  NOT NULL UNIQUE,
-  cost MONEY NOT NULL
+  cost DECIMAL NOT NULL
 );
 
 CREATE TABLE pizzas
@@ -74,7 +74,7 @@ CREATE TABLE deliveries
 
 CREATE TABLE orders
 (
-  id          SERIAL PRIMARY KEY,
+  id          BIGSERIAL PRIMARY KEY,
   delivery_id BIGINT REFERENCES deliveries (id),
   pizza_id    BIGINT REFERENCES pizzas (id),
   ordered_at  TIMESTAMPTZ DEFAULT now()
