@@ -1,5 +1,6 @@
 package com.example.frapizza.service.impl;
 
+import com.example.frapizza.dao.OrderDao;
 import com.example.frapizza.dao.PizzeriaDao;
 import com.example.frapizza.entity.Pizzeria;
 import com.example.frapizza.service.OrderService;
@@ -18,11 +19,13 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class.getName());
   private final PizzeriaDao pizzeriaDao;
+  private final OrderDao orderDao;
   private final WebClient webClient;
   private JsonObject userLocation;
 
   public OrderServiceImpl(Vertx vertx) {
     this.pizzeriaDao = PizzeriaDao.createProxy(vertx, PizzeriaDao.ADDRESS);
+    this.orderDao = OrderDao.createProxy(vertx, OrderDao.ADDRESS);
     this.webClient = WebClient.create(vertx);
   }
 
@@ -32,10 +35,10 @@ public class OrderServiceImpl implements OrderService {
     geocodeUserLocation(deliveryJson)
       .compose(this::matrixRequestBody)
       .compose(this::fetchDistanceMatrix)
-      .compose(this::getMinDistanceAndDuration)
-      .onSuccess(json -> {
-        deliveryJson.mergeIn(json);
-        resultHandler.handle(Future.succeededFuture());
+      .onSuccess(distanceMatrix -> {
+        JsonObject distAndDuration = getMinDistanceAndDuration(distanceMatrix);
+        deliveryJson.mergeIn(distAndDuration);
+        orderDao.save(deliveryPizzas, resultHandler);
       })
       .onFailure(ex -> resultHandler.handle(Future.failedFuture(ex)));
 
@@ -70,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
       });
   }
 
-  private Future<JsonObject> getMinDistanceAndDuration(JsonObject distanceMatrix) {
+  private JsonObject getMinDistanceAndDuration(JsonObject distanceMatrix) {
     JsonArray durations = distanceMatrix.getJsonArray("durations");
     JsonArray distances = distanceMatrix.getJsonArray("distances");
     int minDistIndex = getMinDistanceIndex(distances);
@@ -78,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
     jsonResult.put("pizzeriaFrom", minDistIndex);
     jsonResult.put("distanceM", distances.getJsonArray(minDistIndex).getInteger(0));
     jsonResult.put("expTime", durations.getJsonArray(minDistIndex).getInteger(0));
-    return Future.succeededFuture(jsonResult);
+    return jsonResult;
   }
 
   private int getMinDistanceIndex(JsonArray distances) {
