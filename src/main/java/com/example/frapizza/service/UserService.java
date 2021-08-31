@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 @VertxGen
@@ -23,8 +24,7 @@ public interface UserService {
 
   void save(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler);
   void update(JsonObject userJson, Handler<AsyncResult<JsonObject>> resultHandler);
-  void delete(String id, Handler<AsyncResult<JsonObject>> resultHandler);
-  void readById(String id, Handler<AsyncResult<JsonObject>> resultHandler);
-  void readAll(Handler<AsyncResult<JsonObject>> resultHandler);
+  void delete(Long id, Handler<AsyncResult<JsonObject>> resultHandler);
+  void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 
 }
