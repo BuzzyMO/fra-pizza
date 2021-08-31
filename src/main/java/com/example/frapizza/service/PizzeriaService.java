@@ -1,6 +1,6 @@
-package com.example.frapizza.dao;
+package com.example.frapizza.service;
 
-import com.example.frapizza.dao.impl.PizzeriaDaoImpl;
+import com.example.frapizza.service.impl.PizzeriaServiceImpl;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
@@ -8,19 +8,18 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.pgclient.PgPool;
 
 @VertxGen
 @ProxyGen
-public interface PizzeriaDao {
-  String ADDRESS = "pizzeria.dao";
+public interface PizzeriaService {
+  String ADDRESS = "pizzeria.service";
 
-  static PizzeriaDao create(PgPool pool) {
-    return new PizzeriaDaoImpl(pool);
+  static PizzeriaService create(Vertx vertx) {
+    return new PizzeriaServiceImpl(vertx);
   }
 
-  static PizzeriaDao createProxy(Vertx vertx, String address) {
-    return new PizzeriaDaoVertxEBProxy(vertx, address);
+  static PizzeriaService createProxy(Vertx vertx, String address) {
+    return new PizzeriaServiceVertxEBProxy(vertx, address);
   }
 
   void save(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler);
