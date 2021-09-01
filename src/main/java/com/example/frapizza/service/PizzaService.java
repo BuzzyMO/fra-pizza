@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 @VertxGen
@@ -22,4 +23,8 @@ public interface PizzaService {
   }
 
   void save(JsonObject completePizza, Handler<AsyncResult<Void>> resultHandler);
+  void update(JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler);
+  void delete(Long id, Handler<AsyncResult<Void>> resultHandler);
+  void readByAuthority(Integer authorityId, Handler<AsyncResult<JsonArray>> resultHandler);
+  void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }
