@@ -64,10 +64,10 @@ public class PizzeriaRoute implements PizzeriaRouter{
   private void readAll(RoutingContext routingContext){
     pizzeriaService.readAll(ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Pizzeria is read");
+        LOGGER.info("Pizzerias is read");
         routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
       } else {
-        LOGGER.error("Pizzeria not read: " + ar.cause().getMessage());
+        LOGGER.error("Pizzerias not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
       }
     });

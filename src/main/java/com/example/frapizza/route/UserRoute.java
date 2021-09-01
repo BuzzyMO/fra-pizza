@@ -29,7 +29,7 @@ public class UserRoute implements UserRouter {
         LOGGER.info("User is created");
         routingContext.response().setStatusCode(201).end();
       } else {
-        LOGGER.error("User not created");
+        LOGGER.error("User not created " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
       }
     });

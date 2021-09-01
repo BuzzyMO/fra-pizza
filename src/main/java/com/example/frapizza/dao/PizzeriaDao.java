@@ -24,7 +24,7 @@ public interface PizzeriaDao {
   }
 
   void save(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler);
-  void update(JsonObject pizzeriaJson, Handler<AsyncResult<JsonObject>> resultHandler);
-  void delete(Integer id, Handler<AsyncResult<JsonObject>> resultHandler);
+  void update(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler);
+  void delete(Integer id, Handler<AsyncResult<Void>> resultHandler);
   void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }

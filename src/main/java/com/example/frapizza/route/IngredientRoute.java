@@ -1,11 +1,7 @@
 package com.example.frapizza.route;
 
 import com.example.frapizza.service.IngredientService;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -68,10 +64,10 @@ public class IngredientRoute implements IngredientRouter{
   private void readAll(RoutingContext routingContext){
     ingredientService.readAll(ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Ingredient is read");
+        LOGGER.info("Ingredients is read");
         routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
       } else {
-        LOGGER.error("Ingredient not read: " + ar.cause().getMessage());
+        LOGGER.error("Ingredients not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
       }
     });

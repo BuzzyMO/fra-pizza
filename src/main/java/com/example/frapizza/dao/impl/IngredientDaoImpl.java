@@ -59,7 +59,7 @@ public class IngredientDaoImpl implements IngredientDao {
   }
 
   @Override
-  public void delete(Integer id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Integer id, Handler<AsyncResult<Void>> resultHandler) {
     String deleteQuery = "DELETE FROM ingredients WHERE id=$1";
     pool.withTransaction(client -> client
         .preparedQuery(deleteQuery)

@@ -21,12 +21,12 @@ public class PizzeriaServiceImpl implements PizzeriaService {
   }
 
   @Override
-  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
     pizzeriaDao.update(pizzeriaJson, resultHandler);
   }
 
   @Override
-  public void delete(Integer id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Integer id, Handler<AsyncResult<Void>> resultHandler) {
     pizzeriaDao.delete(id, resultHandler);
   }
 

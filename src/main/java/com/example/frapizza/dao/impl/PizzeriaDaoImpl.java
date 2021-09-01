@@ -42,7 +42,7 @@ public class PizzeriaDaoImpl implements PizzeriaDao {
   }
 
   @Override
-  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
     Pizzeria pizzeria = pizzeriaJson.mapTo(Pizzeria.class);
     String updateQuery = "UPDATE pizzerias SET(city, street, building, latitude, longitude) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
@@ -51,17 +51,17 @@ public class PizzeriaDaoImpl implements PizzeriaDao {
         .execute(Tuple.of(pizzeria.getCity(), pizzeria.getStreet(), pizzeria.getBuilding(),
           pizzeria.getLatitude(), pizzeria.getLongitude(), pizzeria.getId())))
       .onSuccess(rs -> {
-        LOGGER.warn("Transaction succeeded: ingredient is updated " + pizzeria.getId());
+        LOGGER.warn("Transaction succeeded: pizzeria is updated " + pizzeria.getId());
         resultHandler.handle(Future.succeededFuture());
       })
       .onFailure(ex -> {
-        LOGGER.error("Transaction failed: ingredient not updated " + ex.getMessage());
+        LOGGER.error("Transaction failed: pizzeria not updated " + ex.getMessage());
         resultHandler.handle(Future.failedFuture(ex));
       });
   }
 
   @Override
-  public void delete(Integer id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Integer id, Handler<AsyncResult<Void>> resultHandler) {
     String deleteQuery = "DELETE FROM pizzerias WHERE id=$1";
     pool.withTransaction(client -> client
         .preparedQuery(deleteQuery)

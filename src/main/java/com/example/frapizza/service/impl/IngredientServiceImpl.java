@@ -27,7 +27,7 @@ public class IngredientServiceImpl implements IngredientService {
   }
 
   @Override
-  public void delete(Integer id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Integer id, Handler<AsyncResult<Void>> resultHandler) {
     ingredientDao.delete(id, resultHandler);
   }
 

@@ -1,7 +1,6 @@
 package com.example.frapizza.dao.impl;
 
 import com.example.frapizza.dao.UserDao;
-import com.example.frapizza.entity.Pizzeria;
 import com.example.frapizza.entity.User;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -41,7 +40,7 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public void update(JsonObject userJson, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void update(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
     User user = userJson.mapTo(User.class);
     String updateQuery = "UPDATE users SET(first_name, last_name, email, password, phone_number) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
@@ -60,7 +59,7 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public void delete(Long id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Long id, Handler<AsyncResult<Void>> resultHandler) {
     String deleteQuery = "DELETE FROM users WHERE id=$1";
     pool.withTransaction(client -> client
         .preparedQuery(deleteQuery)

@@ -24,12 +24,12 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void update(JsonObject userJson, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void update(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
     userDao.update(userJson, resultHandler);
   }
 
   @Override
-  public void delete(Long id, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void delete(Long id, Handler<AsyncResult<Void>> resultHandler) {
     userDao.delete(id, resultHandler);
   }
 

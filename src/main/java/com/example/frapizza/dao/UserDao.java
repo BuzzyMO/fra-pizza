@@ -24,7 +24,7 @@ public interface UserDao {
   }
 
   void save(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler);
-  void update(JsonObject userJson, Handler<AsyncResult<JsonObject>> resultHandler);
-  void delete(Long id, Handler<AsyncResult<JsonObject>> resultHandler);
+  void update(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler);
+  void delete(Long id, Handler<AsyncResult<Void>> resultHandler);
   void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }
