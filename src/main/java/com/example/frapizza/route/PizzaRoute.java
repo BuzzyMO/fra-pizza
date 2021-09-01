@@ -22,6 +22,7 @@ public class PizzaRoute implements PizzaRouter {
     router.put("/update").handler(this::update);
     router.delete("/delete/:id").handler(this::delete);
     router.get("/read/authority/:authority").handler(this::readByAuthority);
+    router.get("/read/user").handler(this::readByUser);
     router.get("/read").handler(this::readAll);
   }
 
@@ -77,6 +78,21 @@ public class PizzaRoute implements PizzaRouter {
       }
     });
   }
+
+
+  private void readByUser(RoutingContext routingContext){
+    Long userId = routingContext.user().get("id");
+    pizzaService.readByUser(userId, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.info("Pizzas is read by user " + userId);
+        routingContext.response().setStatusCode(201).end();
+      } else {
+        LOGGER.error("Pizzas not read by user " + ar.cause().getMessage());
+        routingContext.response().setStatusCode(400).end();
+      }
+    });
+  }
+
   private void readAll(RoutingContext routingContext){
     pizzaService.readAll(ar -> {
       if (ar.succeeded()) {

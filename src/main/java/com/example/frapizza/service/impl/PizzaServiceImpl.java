@@ -36,6 +36,11 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
+  public void readByUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler) {
+    pizzaDao.readByUser(userId, resultHandler);
+  }
+
+  @Override
   public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
     pizzaDao.readAll(resultHandler);
   }

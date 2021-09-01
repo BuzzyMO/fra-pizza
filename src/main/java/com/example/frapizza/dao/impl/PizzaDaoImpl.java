@@ -111,6 +111,27 @@ public class PizzaDaoImpl implements PizzaDao {
   }
 
   @Override
+  public void readByUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler) {
+    String readQuery = "SELECT* FROM pizzas INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id " +
+      "INNER JOIN ingredients i on i.id = pi.ingredient_id WHERE created_by=$1";
+    pool.withTransaction(client -> client
+        .preparedQuery(readQuery)
+        .execute(Tuple.of(userId)))
+      .onSuccess(rs -> {
+        JsonArray jsonArray = new JsonArray();
+        for (Row row : rs) {
+          jsonArray.add(row.toJson());
+        }
+        LOGGER.info("Transaction succeeded: pizzas is read by user " + userId);
+        resultHandler.handle(Future.succeededFuture(jsonArray));
+      })
+      .onFailure(ex -> {
+        LOGGER.error("Transaction failed: pizzas not read by user: " + ex.getMessage());
+        resultHandler.handle(Future.failedFuture(ex));
+      });
+  }
+
+  @Override
   public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
     String readAllQuery = "SELECT* FROM pizzas INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id INNER JOIN ingredients i on i.id = pi.ingredient_id";
     pool.withTransaction(client -> client
