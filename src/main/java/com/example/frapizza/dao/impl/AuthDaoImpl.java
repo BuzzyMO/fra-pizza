@@ -21,7 +21,7 @@ public class AuthDaoImpl implements AuthDao {
 
   @Override
   public void authentication(JsonObject credentials, Handler<AsyncResult<JsonObject>> resultHandler) {
-    String query = "SELECT* FROM users WHERE email=$1 AND password=$2";
+    String query = "SELECT id, first_name, last_name, email FROM users WHERE email=$1 AND password=$2";
 
     pool.withTransaction(client -> client
         .preparedQuery(query)
