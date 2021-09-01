@@ -38,7 +38,7 @@ public class PizzeriaRoute implements PizzeriaRouter{
   private void update(RoutingContext routingContext){
     pizzeriaService.update(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Pizzeria is updated");
+        LOGGER.warn("Pizzeria is updated");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Pizzeria not updated: " + ar.cause().getMessage());
@@ -52,7 +52,7 @@ public class PizzeriaRoute implements PizzeriaRouter{
     Integer id = Integer.parseInt(idStr);
     pizzeriaService.delete(id, ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Pizzeria is deleted");
+        LOGGER.warn("Pizzeria is deleted");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Pizzeria not deleted: " + ar.cause().getMessage());

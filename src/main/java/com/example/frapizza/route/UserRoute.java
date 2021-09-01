@@ -37,7 +37,7 @@ public class UserRoute implements UserRouter {
   private void update(RoutingContext routingContext){
     userService.update(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("User is updated");
+        LOGGER.warn("User is updated");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("User not updated: " + ar.cause().getMessage());
@@ -51,7 +51,7 @@ public class UserRoute implements UserRouter {
     Long id = Long.parseLong(idStr);
     userService.delete(id, ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("User is deleted");
+        LOGGER.warn("User is deleted");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("User not deleted: " + ar.cause().getMessage());

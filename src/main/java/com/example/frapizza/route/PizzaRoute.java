@@ -44,7 +44,7 @@ public class PizzaRoute implements PizzaRouter {
   private void update(RoutingContext routingContext){
     pizzaService.update(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Pizza is updated");
+        LOGGER.warn("Pizza is updated");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Pizza not updated " + ar.cause().getMessage());
@@ -57,7 +57,7 @@ public class PizzaRoute implements PizzaRouter {
     Long id = Long.parseLong(idStr);
     pizzaService.delete(id, ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Pizza is deleted");
+        LOGGER.warn("Pizza is deleted");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Pizza not deleted " + ar.cause().getMessage());
@@ -103,7 +103,6 @@ public class PizzaRoute implements PizzaRouter {
         routingContext.response().setStatusCode(400).end();
       }
     });
-
   }
 
   public Router getRouter() {

@@ -38,7 +38,7 @@ public class IngredientRoute implements IngredientRouter{
   private void update(RoutingContext routingContext){
     ingredientService.update(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Ingredient is updated");
+        LOGGER.warn("Ingredient is updated");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Ingredient not updated: " + ar.cause().getMessage());
@@ -52,7 +52,7 @@ public class IngredientRoute implements IngredientRouter{
     Integer id = Integer.parseInt(idStr);
     ingredientService.delete(id, ar -> {
       if (ar.succeeded()) {
-        LOGGER.info("Ingredient is deleted");
+        LOGGER.warn("Ingredient is deleted");
         routingContext.response().setStatusCode(201).end();
       } else {
         LOGGER.error("Ingredient not deleted: " + ar.cause().getMessage());
