@@ -17,8 +17,8 @@ CREATE TABLE authorities
 
 CREATE TABLE user_authorities
 (
-  user_id      BIGINT REFERENCES users (id),
-  authority_id INT REFERENCES authorities (id),
+  user_id      BIGINT REFERENCES users (id) ON DELETE CASCADE,
+  authority_id INT REFERENCES authorities (id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, authority_id)
 );
 
@@ -30,7 +30,7 @@ values (1, 'ROLE_ADMIN');
 CREATE TABLE ingredients
 (
   id   SERIAL PRIMARY KEY,
-  name TEXT  NOT NULL UNIQUE,
+  name TEXT    NOT NULL UNIQUE,
   cost DECIMAL NOT NULL
 );
 
@@ -38,14 +38,14 @@ CREATE TABLE pizzas
 (
   id         BIGSERIAL PRIMARY KEY,
   name       TEXT   NOT NULL,
-  created_by BIGINT NOT NULL REFERENCES users (id),
+  created_by BIGINT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE pizza_ingredients
 (
-  pizza_id      BIGINT REFERENCES pizzas (id),
-  ingredient_id INT REFERENCES ingredients (id),
+  pizza_id      BIGINT REFERENCES pizzas (id) ON DELETE CASCADE,
+  ingredient_id INT REFERENCES ingredients (id) ON DELETE CASCADE,
   PRIMARY KEY (pizza_id, ingredient_id)
 );
 
@@ -62,20 +62,20 @@ CREATE TABLE pizzerias
 CREATE TABLE deliveries
 (
   id            BIGSERIAL PRIMARY KEY,
-  created_by    BIGSERIAL REFERENCES users (id),
-  pizzeria_from INT   NOT NULL REFERENCES pizzerias (id),
-  city          TEXT  NOT NULL,
-  street        TEXT  NOT NULL,
-  building      TEXT  NOT NULL,
+  created_by    BIGSERIAL REFERENCES users (id) ON DELETE CASCADE,
+  pizzeria_from INT  NOT NULL REFERENCES pizzerias (id) ON DELETE CASCADE,
+  city          TEXT NOT NULL,
+  street        TEXT NOT NULL,
+  building      TEXT NOT NULL,
   apartment     TEXT,
-  distance_m    INT   NOT NULL,
-  exp_time      INT   NOT NULL
+  distance_m    INT  NOT NULL,
+  exp_time      INT  NOT NULL
 );
 
 CREATE TABLE orders
 (
   id          BIGSERIAL PRIMARY KEY,
-  delivery_id BIGINT REFERENCES deliveries (id),
-  pizza_id    BIGINT REFERENCES pizzas (id),
+  delivery_id BIGINT REFERENCES deliveries (id) ON DELETE CASCADE,
+  pizza_id    BIGINT REFERENCES pizzas (id) ON DELETE CASCADE,
   ordered_at  TIMESTAMPTZ DEFAULT now()
 );
