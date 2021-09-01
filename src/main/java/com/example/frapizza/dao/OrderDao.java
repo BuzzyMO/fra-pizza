@@ -6,6 +6,7 @@ import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 
@@ -23,4 +24,6 @@ public interface OrderDao {
   }
 
   void save(JsonObject deliveryPizzas, Handler<AsyncResult<Void>> resultHandler);
+  void delete(Long id, Handler<AsyncResult<Void>> resultHandler);
+  void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }

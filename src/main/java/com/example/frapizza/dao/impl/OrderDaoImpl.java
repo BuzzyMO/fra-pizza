@@ -5,6 +5,7 @@ import com.example.frapizza.entity.Delivery;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
@@ -43,13 +44,50 @@ public class OrderDaoImpl implements OrderDao {
           delivery.getStreet(), delivery.getBuilding(), delivery.getApartment(),
           delivery.getDistanceM(), delivery.getExpTime()))
         .map(rs -> rs.iterator().next().getLong("id"))
-        .compose(id -> saveOrder(client, id, pizzaIds)))
-      .onSuccess(rs -> {
-        LOGGER.info("Transaction succeeded: order is created");
+        .compose(id -> saveOrder(client, id, pizzaIds))
+        .map(rs -> rs.iterator().next().getLong("id")))
+      .onSuccess(id -> {
+        LOGGER.info("Transaction succeeded: order is created " + id);
         resultHandler.handle(Future.succeededFuture());
       })
       .onFailure(ex -> {
         LOGGER.error("Transaction failed: order not created" + ex.getMessage());
+        resultHandler.handle(Future.failedFuture(ex));
+      });
+  }
+
+  @Override
+  public void delete(Long id, Handler<AsyncResult<Void>> resultHandler) {
+    String deleteQuery = "DELETE FROM orders WHERE id=$1";
+    pool.withTransaction(client -> client
+        .preparedQuery(deleteQuery)
+        .execute(Tuple.of(id)))
+      .onSuccess(rs -> {
+        LOGGER.warn("Transaction succeeded: order is deleted " + id);
+        resultHandler.handle(Future.succeededFuture());
+      })
+      .onFailure(ex -> {
+        LOGGER.error("Transaction failed: order not deleted " + ex.getMessage());
+        resultHandler.handle(Future.failedFuture(ex));
+      });
+  }
+
+  @Override
+  public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
+    String readAllQuery = "SELECT* FROM orders INNER JOIN deliveries d on d.id = orders.delivery_id";
+    pool.withTransaction(client -> client
+        .preparedQuery(readAllQuery)
+        .execute())
+      .onSuccess(rs -> {
+        JsonArray jsonArray = new JsonArray();
+        for (Row row : rs) {
+          jsonArray.add(row.toJson());
+        }
+        LOGGER.info("Transaction succeeded: orders is read");
+        resultHandler.handle(Future.succeededFuture(jsonArray));
+      })
+      .onFailure(ex -> {
+        LOGGER.error("Transaction failed: orders not read: " + ex.getMessage());
         resultHandler.handle(Future.failedFuture(ex));
       });
   }
@@ -61,7 +99,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     String insertOrderQuery = "INSERT INTO orders(delivery_id, pizza_id) " +
-      "VALUES ($1, $2)";
+      "VALUES ($1, $2) RETURNING id";
     return client
       .preparedQuery(insertOrderQuery)
       .executeBatch(batch);

@@ -44,6 +44,16 @@ public class OrderServiceImpl implements OrderService {
 
   }
 
+  @Override
+  public void delete(Long id, Handler<AsyncResult<Void>> resultHandler) {
+    orderDao.delete(id, resultHandler);
+  }
+
+  @Override
+  public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
+    orderDao.readAll(resultHandler);
+  }
+
   private Future<Void> geocodeUserLocation(JsonObject deliveryJson) {
     String requestUrl = "nominatim.openstreetmap.org";
     String qParam = deliveryJson.getString("city") + " "
