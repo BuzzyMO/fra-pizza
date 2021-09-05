@@ -42,16 +42,16 @@ public class PizzeriaDaoImpl implements PizzeriaDao {
   }
 
   @Override
-  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
+  public void update(Integer id, JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
     Pizzeria pizzeria = pizzeriaJson.mapTo(Pizzeria.class);
     String updateQuery = "UPDATE pizzerias SET(city, street, building, latitude, longitude) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
     pool.withTransaction(client -> client
         .preparedQuery(updateQuery)
         .execute(Tuple.of(pizzeria.getCity(), pizzeria.getStreet(), pizzeria.getBuilding(),
-          pizzeria.getLatitude(), pizzeria.getLongitude(), pizzeria.getId())))
+          pizzeria.getLatitude(), pizzeria.getLongitude(), id)))
       .onSuccess(rs -> {
-        LOGGER.warn("Transaction succeeded: pizzeria is updated " + pizzeria.getId());
+        LOGGER.warn("Transaction succeeded: pizzeria is updated " + id);
         resultHandler.handle(Future.succeededFuture());
       })
       .onFailure(ex -> {

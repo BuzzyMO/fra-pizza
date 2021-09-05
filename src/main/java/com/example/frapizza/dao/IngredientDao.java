@@ -24,7 +24,7 @@ public interface IngredientDao {
   }
 
   void save(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler);
-  void update(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler);
+  void update(Integer id, JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler);
   void delete(Integer id, Handler<AsyncResult<Void>> resultHandler);
   void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }

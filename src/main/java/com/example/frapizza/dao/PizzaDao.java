@@ -24,7 +24,7 @@ public interface PizzaDao {
   }
 
   void save(JsonObject completePizza, Handler<AsyncResult<Void>> resultHandler);
-  void update(JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler);
+  void update(Long id, JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler);
   void delete(Long id, Handler<AsyncResult<Void>> resultHandler);
   void readByAuthority(Integer authorityId, Handler<AsyncResult<JsonArray>> resultHandler);
   void readByUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler);

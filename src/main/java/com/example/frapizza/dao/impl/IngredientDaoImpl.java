@@ -41,15 +41,15 @@ public class IngredientDaoImpl implements IngredientDao {
   }
 
   @Override
-  public void update(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
+  public void update(Integer id, JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
     Ingredient ingredient = ingredientJson.mapTo(Ingredient.class);
     String updateQuery = "UPDATE ingredients SET(name, cost) = ($1, $2) " +
       "WHERE id=$3";
     pool.withTransaction(client -> client
         .preparedQuery(updateQuery)
-        .execute(Tuple.of(ingredient.getName(), ingredient.getCost(), ingredient.getId())))
+        .execute(Tuple.of(ingredient.getName(), ingredient.getCost(), id)))
       .onSuccess(rs -> {
-        LOGGER.warn("Transaction succeeded: ingredient is updated " + ingredient.getId());
+        LOGGER.warn("Transaction succeeded: ingredient is updated " + id);
         resultHandler.handle(Future.succeededFuture());
       })
       .onFailure(ex -> {

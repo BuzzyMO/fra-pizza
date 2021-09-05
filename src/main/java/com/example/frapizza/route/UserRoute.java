@@ -17,10 +17,10 @@ public class UserRoute implements UserRouter {
     userService = UserService.createProxy(vertx, UserService.ADDRESS);
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    router.post("/save").handler(this::save);
-    router.put("/update").handler(this::update);
-    router.delete("/delete/:id").handler(this::delete);
-    router.get("/read").handler(this::readAll);
+    router.post().handler(this::save);
+    router.put("/:id").handler(this::update);
+    router.delete("/:id").handler(this::delete);
+    router.get().handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
@@ -34,11 +34,14 @@ public class UserRoute implements UserRouter {
       }
     });
   }
-  private void update(RoutingContext routingContext){
-    userService.update(routingContext.getBodyAsJson(), ar -> {
+
+  private void update(RoutingContext routingContext) {
+    String idStr = routingContext.pathParam("id");
+    Long id = Long.parseLong(idStr);
+    userService.update(id, routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("User is updated");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(200).end();
       } else {
         LOGGER.error("User not updated: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -46,13 +49,13 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext){
+  private void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     userService.delete(id, ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("User is deleted");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(204).end();
       } else {
         LOGGER.error("User not deleted: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -60,11 +63,14 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void readAll(RoutingContext routingContext){
+  private void readAll(RoutingContext routingContext) {
     userService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Users is read");
-        routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Users not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();

@@ -18,12 +18,12 @@ public class PizzaRoute implements PizzaRouter {
     pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    router.post("/save").handler(this::save);
-    router.put("/update").handler(this::update);
-    router.delete("/delete/:id").handler(this::delete);
-    router.get("/read/authority/:authority").handler(this::readByAuthority);
-    router.get("/read/user").handler(this::readByUser);
-    router.get("/read").handler(this::readAll);
+    router.post().handler(this::save);
+    router.put("/:id").handler(this::update);
+    router.delete("/:id").handler(this::delete);
+    router.get("/authority/:authority").handler(this::readByAuthority);
+    router.get("/user").handler(this::readByUser);
+    router.get().handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
@@ -42,10 +42,12 @@ public class PizzaRoute implements PizzaRouter {
     });
   }
   private void update(RoutingContext routingContext){
-    pizzaService.update(routingContext.getBodyAsJson(), ar -> {
+    String idStr = routingContext.pathParam("id");
+    Long id = Long.parseLong(idStr);
+    pizzaService.update(id, routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("Pizza is updated");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(200).end();
       } else {
         LOGGER.error("Pizza not updated " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -58,7 +60,7 @@ public class PizzaRoute implements PizzaRouter {
     pizzaService.delete(id, ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("Pizza is deleted");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(204).end();
       } else {
         LOGGER.error("Pizza not deleted " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -71,7 +73,10 @@ public class PizzaRoute implements PizzaRouter {
     pizzaService.readByAuthority(id, ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzas is read by " + authorityStr);
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Pizzas not read by authority " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -85,7 +90,10 @@ public class PizzaRoute implements PizzaRouter {
     pizzaService.readByUser(userId, ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzas is read by user " + userId);
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Pizzas not read by user " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -97,7 +105,10 @@ public class PizzaRoute implements PizzaRouter {
     pizzaService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzas is read");
-        routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Pizzas not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();

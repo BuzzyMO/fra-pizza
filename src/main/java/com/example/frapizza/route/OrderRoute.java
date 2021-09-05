@@ -18,9 +18,9 @@ public class OrderRoute implements OrderRouter{
     this.orderService = OrderService.createProxy(vertx, OrderService.ADDRESS);
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    router.post("/save").handler(this::save);
-    router.delete("/delete/:id").handler(this::delete);
-    router.get("/read").handler(this::readAll);
+    router.post().handler(this::save);
+    router.delete("/:id").handler(this::delete);
+    router.get().handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
@@ -45,7 +45,7 @@ public class OrderRoute implements OrderRouter{
     orderService.delete(id, ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("Order is deleted");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(204).end();
       } else {
         LOGGER.error("Order not deleted " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -56,7 +56,10 @@ public class OrderRoute implements OrderRouter{
     orderService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Orders is read");
-        routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Orders not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();

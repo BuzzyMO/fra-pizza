@@ -24,8 +24,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public void update(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
-    userDao.update(userJson, resultHandler);
+  public void update(Long id, JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
+    userDao.update(id, userJson, resultHandler);
   }
 
   @Override

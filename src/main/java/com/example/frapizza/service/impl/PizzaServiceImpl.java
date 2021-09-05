@@ -21,8 +21,8 @@ public class PizzaServiceImpl implements PizzaService {
   }
 
   @Override
-  public void update(JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
-    pizzaDao.update(pizzaJson, resultHandler);
+  public void update(Long id, JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
+    pizzaDao.update(id, pizzaJson, resultHandler);
   }
 
   @Override

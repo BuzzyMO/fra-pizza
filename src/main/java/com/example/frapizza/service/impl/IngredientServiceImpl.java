@@ -22,8 +22,8 @@ public class IngredientServiceImpl implements IngredientService {
   }
 
   @Override
-  public void update(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
-    ingredientDao.update(ingredientJson, resultHandler);
+  public void update(Integer id, JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
+    ingredientDao.update(id, ingredientJson, resultHandler);
   }
 
   @Override

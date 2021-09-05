@@ -2,7 +2,6 @@ package com.example.frapizza.dao.impl;
 
 import com.example.frapizza.dao.PizzaDao;
 import com.example.frapizza.entity.Pizza;
-import com.example.frapizza.entity.Pizzeria;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -55,13 +54,13 @@ public class PizzaDaoImpl implements PizzaDao {
   }
 
   @Override
-  public void update(JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
+  public void update(Long id, JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
     Pizza pizza = pizzaJson.mapTo(Pizza.class);
     String updateQuery = "UPDATE pizzas SET(name, created_by, created_at) " +
       "= ($1, $2, $3) WHERE id=$4";
     pool.withTransaction(client -> client
         .preparedQuery(updateQuery)
-        .execute(Tuple.of(pizza.getName(), pizza.getCreatedBy(), pizza.getCreatedAt(), pizza.getId())))
+        .execute(Tuple.of(pizza.getName(), pizza.getCreatedBy(), pizza.getCreatedAt(), id)))
       .onSuccess(rs -> {
         LOGGER.warn("Transaction succeeded: pizza is updated " + pizza.getId());
         resultHandler.handle(Future.succeededFuture());

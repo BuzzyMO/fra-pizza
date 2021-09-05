@@ -17,10 +17,10 @@ public class IngredientRoute implements IngredientRouter{
     this.ingredientService = IngredientService.createProxy(vertx, IngredientService.ADDRESS);
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    router.post("/save").handler(this::save);
-    router.put("/update").handler(this::update);
-    router.delete("/delete/:id").handler(this::delete);
-    router.get("/read").handler(this::readAll);
+    router.post().handler(this::save);
+    router.put("/:id").handler(this::update);
+    router.delete("/:id").handler(this::delete);
+    router.get().handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
@@ -36,10 +36,12 @@ public class IngredientRoute implements IngredientRouter{
   }
 
   private void update(RoutingContext routingContext){
-    ingredientService.update(routingContext.getBodyAsJson(), ar -> {
+    String idStr = routingContext.pathParam("id");
+    Integer id = Integer.parseInt(idStr);
+    ingredientService.update(id, routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("Ingredient is updated");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(200).end();
       } else {
         LOGGER.error("Ingredient not updated: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -53,7 +55,7 @@ public class IngredientRoute implements IngredientRouter{
     ingredientService.delete(id, ar -> {
       if (ar.succeeded()) {
         LOGGER.warn("Ingredient is deleted");
-        routingContext.response().setStatusCode(201).end();
+        routingContext.response().setStatusCode(204).end();
       } else {
         LOGGER.error("Ingredient not deleted: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
@@ -65,7 +67,10 @@ public class IngredientRoute implements IngredientRouter{
     ingredientService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Ingredients is read");
-        routingContext.response().setStatusCode(201).end(ar.result().toBuffer());
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Ingredients not read: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();

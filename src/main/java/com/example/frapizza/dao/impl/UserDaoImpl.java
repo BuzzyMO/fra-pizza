@@ -40,16 +40,16 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public void update(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
+  public void update(Long id, JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
     User user = userJson.mapTo(User.class);
     String updateQuery = "UPDATE users SET(first_name, last_name, email, password, phone_number) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
     pool.withTransaction(client -> client
         .preparedQuery(updateQuery)
         .execute(Tuple.of(user.getFirstName(), user.getLastName(), user.getEmail(),
-          user.getPassword(), user.getPhoneNumber(), user.getId())))
+          user.getPassword(), user.getPhoneNumber(), id)))
       .onSuccess(rs -> {
-        LOGGER.warn("Transaction succeeded: user is updated " + user.getId());
+        LOGGER.warn("Transaction succeeded: user is updated " + id);
         resultHandler.handle(Future.succeededFuture());
       })
       .onFailure(ex -> {
@@ -90,6 +90,7 @@ public class UserDaoImpl implements UserDao {
       })
       .onFailure(ex -> {
         LOGGER.error("Transaction failed: users not read: " + ex.getMessage());
+        ex.printStackTrace();
         resultHandler.handle(Future.failedFuture(ex));
       });
   }

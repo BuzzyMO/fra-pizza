@@ -21,8 +21,8 @@ public class PizzeriaServiceImpl implements PizzeriaService {
   }
 
   @Override
-  public void update(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
-    pizzeriaDao.update(pizzeriaJson, resultHandler);
+  public void update(Integer id, JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
+    pizzeriaDao.update(id, pizzeriaJson, resultHandler);
   }
 
   @Override
