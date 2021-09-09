@@ -20,6 +20,7 @@ val junitJupiterVersion = "5.7.0"
 val logbackVersion = "1.2.3"
 val flywayVersion = "7.14.0"
 val slf4jVersion = "1.7.30"
+val testcontainersVersion = "1.15.0-rc2"
 
 val mainVerticleName = "com.example.frapizza.MainVerticle"
 val launcherClassName = "io.vertx.core.Launcher"
@@ -46,11 +47,16 @@ dependencies {
   implementation("io.vertx:vertx-web-sstore-redis:$vertxVersion")
   implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
 
-//  "Only for migrations"
-  compileOnly("org.postgresql:postgresql:42.2.23")
+  testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
+  testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
+  testImplementation("org.testcontainers:postgresql:1.16.0")
+
+  implementation("org.postgresql:postgresql:42.2.23")
 
   testImplementation("io.vertx:vertx-junit5")
   testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+  testImplementation("io.reactiverse:reactiverse-junit5-web-client:0.3.0")
+
 
   annotationProcessor("io.vertx:vertx-rx-java3-gen:$vertxVersion")
   annotationProcessor("io.vertx:vertx-codegen:$vertxVersion:processor")
@@ -77,6 +83,15 @@ tasks.withType<ShadowJar> {
 }
 
 tasks.withType<Test> {
+  environment("DATASOURCE_PORT", 5432)
+  environment("DATASOURCE_URL", "jdbc:postgresql://localhost:5432/fra_pizza")
+  environment("DATASOURCE_HOST", "localhost")
+  environment("DATASOURCE_DBNAME", "fra_pizza")
+  environment("DATASOURCE_USERNAME","postgres")
+  environment("REDIS_URI","redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0")
+  environment("DATASOURCE_PASSWORD","postgres")
+  environment("DATASOURCE_USERNAME","postgres")
+
   useJUnitPlatform()
   testLogging {
     events = setOf(PASSED, SKIPPED, FAILED)
@@ -84,6 +99,14 @@ tasks.withType<Test> {
 }
 
 tasks.withType<JavaExec> {
+  environment("DATASOURCE_URL", "jdbc:postgresql://localhost:5432/fra_pizza")
+  environment("DATASOURCE_PORT", 5432)
+  environment("DATASOURCE_HOST", "localhost")
+  environment("DATASOURCE_DBNAME", "fra_pizza")
+  environment("DATASOURCE_USERNAME","postgres")
+  environment("REDIS_URI","redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0")
+  environment("DATASOURCE_PASSWORD","postgres")
+  environment("DATASOURCE_USERNAME","postgres")
   args = listOf("run", mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$launcherClassName", "--on-redeploy=$doOnChange")
 }
 
