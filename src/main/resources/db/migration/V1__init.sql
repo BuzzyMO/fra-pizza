@@ -36,10 +36,11 @@ CREATE TABLE ingredients
 
 CREATE TABLE pizzas
 (
-  id         BIGSERIAL PRIMARY KEY,
-  name       TEXT   NOT NULL,
-  created_by BIGINT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT now()
+  id          BIGSERIAL PRIMARY KEY,
+  name        TEXT   NOT NULL,
+  description TEXT,
+  created_by  BIGINT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  created_at  TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE pizza_ingredients
@@ -68,8 +69,8 @@ CREATE TABLE deliveries
   street        TEXT NOT NULL,
   building      TEXT NOT NULL,
   apartment     TEXT,
-  distance_m    INT  NOT NULL,
-  exp_time      INT  NOT NULL
+  distance_m    INT,
+  exp_time      INT
 );
 
 CREATE TABLE orders
