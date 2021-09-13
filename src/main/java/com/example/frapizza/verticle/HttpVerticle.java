@@ -1,17 +1,15 @@
 package com.example.frapizza.verticle;
 
 import com.example.frapizza.route.*;
-import com.example.frapizza.util.ConfigLoader;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
-import io.vertx.core.json.JsonObject;
+import io.vertx.core.http.CookieSameSite;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.AuthenticationHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.SessionHandler;
+import io.vertx.ext.web.sstore.SessionStore;
 import io.vertx.ext.web.sstore.redis.RedisSessionStore;
-import io.vertx.redis.client.Command;
 import io.vertx.redis.client.Redis;
-import io.vertx.redis.client.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,25 +19,16 @@ public class HttpVerticle extends AbstractVerticle {
 
   @Override
   public void start(Promise<Void> promise) {
-    JsonObject props = ConfigLoader.loadEnv(vertx);
-
-    Redis redis = Redis.createClient(vertx, props.getString("REDIS_URI"));
-    redis.send(Request.cmd(Command.PING))
-      .onSuccess(r -> System.out.println("r = " + r))
-      .onFailure(ex -> System.out.println("ex = " + ex));
-
-    RedisSessionStore store = RedisSessionStore.create(vertx, redis);
-    SessionHandler sessionHandler = SessionHandler.create(store);
-
-    AuthenticationHandler authHandler = AuthHandler.createAuthHandler(vertx);
+    SessionStore sessionStore = getRedisStore();
+    SessionHandler sessionHandler = getSessionHandler(sessionStore);
+    CorsHandler corsHandler = corsConfig();
 
     Router router = Router.router(vertx);
-    router.route().handler(sessionHandler)
-      .handler(authHandler);
-    Router userRouter = UserRouter.create(vertx);
-    Router pizzaRouter = PizzaRouter.create(vertx);
-    router.mountSubRouter("/api/user", userRouter);
-    router.mountSubRouter("/api/pizza", pizzaRouter);
+    router.route()
+      .handler(corsHandler)
+      .handler(sessionHandler);
+
+    mountSubRouters(router, sessionHandler, sessionStore);
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -53,4 +42,37 @@ public class HttpVerticle extends AbstractVerticle {
         promise.fail(ex);
       });
   }
+
+  private RedisSessionStore getRedisStore(){
+    Redis redis = Redis.createClient(vertx, config().getString("REDIS_URI"));
+    return RedisSessionStore.create(vertx, redis);
+  }
+
+  private SessionHandler getSessionHandler(SessionStore store) {
+    SessionHandler sessionHandler = SessionHandler.create(store);
+    sessionHandler.setCookieSameSite(CookieSameSite.STRICT);
+    return sessionHandler;
+  }
+
+  private CorsHandler corsConfig(){
+    return CorsHandler.create()
+      .addOrigin(config().getString("CORS_ORIGIN"))
+      .allowCredentials(true);
+  }
+
+  private void mountSubRouters(Router router, SessionHandler sessionHandler, SessionStore sessionStore){
+    Router authRouter = AuthRouter.create(vertx, sessionHandler, sessionStore);
+    Router userRouter = UserRouter.create(vertx);
+    Router pizzaRouter = PizzaRouter.create(vertx);
+    Router orderRouter = OrderRouter.create(vertx);
+    Router ingredientRouter = IngredientRouter.create(vertx);
+    Router pizzeriaRouter = PizzeriaRouter.create(vertx);
+    router.mountSubRouter("/api/auth", authRouter);
+    router.mountSubRouter("/api/users", userRouter);
+    router.mountSubRouter("/api/pizzas", pizzaRouter);
+    router.mountSubRouter("/api/orders", orderRouter);
+    router.mountSubRouter("/api/ingredients", ingredientRouter);
+    router.mountSubRouter("/api/pizzerias", pizzeriaRouter);
+  }
+
 }
