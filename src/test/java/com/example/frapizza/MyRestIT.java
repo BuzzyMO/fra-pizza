@@ -88,7 +88,7 @@ public class MyRestIT {
 
   @Test
   void auth(Vertx vertx, WebClient client, VertxTestContext testContext) {
-    testRequest(client, HttpMethod.HEAD, "/api/auth")
+    testRequest(client, HttpMethod.POST, "/api/auth")
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(statusCode(200))
       .send(testContext);
