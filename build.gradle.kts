@@ -46,6 +46,7 @@ dependencies {
   implementation("io.vertx:vertx-config")
   implementation("io.vertx:vertx-web-sstore-redis:$vertxVersion")
   implementation("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+  implementation("io.vertx:vertx-auth-sql-client:$vertxVersion")
 
   testImplementation("org.testcontainers:testcontainers:$testcontainersVersion")
   testImplementation("org.testcontainers:junit-jupiter:$testcontainersVersion")
@@ -87,10 +88,13 @@ tasks.withType<Test> {
   environment("DATASOURCE_URL", "jdbc:postgresql://localhost:5432/fra_pizza")
   environment("DATASOURCE_HOST", "localhost")
   environment("DATASOURCE_DBNAME", "fra_pizza")
-  environment("DATASOURCE_USERNAME","postgres")
-  environment("REDIS_URI","redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0")
-  environment("DATASOURCE_PASSWORD","postgres")
-  environment("DATASOURCE_USERNAME","postgres")
+  environment("DATASOURCE_USERNAME", "postgres")
+  environment("DATASOURCE_PASSWORD", "postgres")
+  environment("CORS_ORIGIN", "http://localhost:3000/")
+  environment(
+    "REDIS_URI",
+    "redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0"
+  )
 
   useJUnitPlatform()
   testLogging {
@@ -103,11 +107,20 @@ tasks.withType<JavaExec> {
   environment("DATASOURCE_PORT", 5432)
   environment("DATASOURCE_HOST", "localhost")
   environment("DATASOURCE_DBNAME", "fra_pizza")
-  environment("DATASOURCE_USERNAME","postgres")
-  environment("REDIS_URI","redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0")
-  environment("DATASOURCE_PASSWORD","postgres")
-  environment("DATASOURCE_USERNAME","postgres")
-  args = listOf("run", mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$launcherClassName", "--on-redeploy=$doOnChange")
+  environment("DATASOURCE_USERNAME", "postgres")
+  environment("DATASOURCE_PASSWORD", "postgres")
+  environment("CORS_ORIGIN", "http://localhost:3000/")
+  environment(
+    "REDIS_URI",
+    "redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0"
+  )
+  args = listOf(
+    "run",
+    mainVerticleName,
+    "--redeploy=$watchForChange",
+    "--launcher-class=$launcherClassName",
+    "--on-redeploy=$doOnChange"
+  )
 }
 
 tasks.getByName<JavaCompile>("compileJava") {

@@ -8,6 +8,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.sqlclient.SqlAuthentication;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlClient;
@@ -25,13 +26,14 @@ public class AuthDaoImpl implements AuthDao {
 
   @Override
   public void authentication(JsonObject credentials, Handler<AsyncResult<JsonObject>> resultHandler) {
-    String query = "SELECT id, first_name, last_name, email FROM users WHERE email=$1 AND password=$2";
+    String query = "SELECT id, first_name, last_name, email, password, password_salt FROM users WHERE email=$1";
 
     pool.withTransaction(client -> client
         .preparedQuery(query)
-        .execute(Tuple.of(credentials.getString("username"), credentials.getString("password")))
+        .execute(Tuple.of(credentials.getString("username")))
         .map(rs -> rs.iterator().next().toJson())
-        .compose(this::validation)
+        .compose(rs -> validation(rs, credentials))
+        .map(this::removeCredentialsInfo)
         .compose(resultJson -> setRoles(client, resultJson)))
       .onSuccess(json -> {
         LOGGER.info("Transaction succeeded: auth complete, id - " + json.getLong("id"));
@@ -43,14 +45,30 @@ public class AuthDaoImpl implements AuthDao {
       });
   }
 
-  private Future<JsonObject> validation(JsonObject resultJson) {
+  private Future<JsonObject> validation(JsonObject resultJson, JsonObject credentials) {
     Promise<JsonObject> promise = Promise.promise();
-    if (!resultJson.isEmpty()) {
+    if (!resultJson.isEmpty() && isValidPassword(resultJson, credentials)) {
       promise.complete(resultJson);
     } else {
       promise.fail(new IncorrectCredentialsException("Password or email is incorrect"));
     }
     return promise.future();
+  }
+
+  private boolean isValidPassword(JsonObject resultJson, JsonObject credentials) {
+    SqlAuthentication sqlAuth = SqlAuthentication.create(pool);
+    String algorithm = "pbkdf2";
+    String salt = resultJson.getString("password_salt");
+    String password = resultJson.getString("password");
+    String currentHash = sqlAuth.hash(algorithm, salt, credentials.getString("password"));
+
+    return currentHash.equals(password);
+  }
+
+  private JsonObject removeCredentialsInfo(JsonObject resultJson) {
+    resultJson.remove("password");
+    resultJson.remove("password_salt");
+    return resultJson;
   }
 
   private Future<JsonObject> setRoles(SqlClient client, JsonObject resultJson) {

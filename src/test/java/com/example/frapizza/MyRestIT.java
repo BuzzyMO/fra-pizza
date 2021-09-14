@@ -78,7 +78,7 @@ public class MyRestIT {
     );
   }
 
-  private static Future<Void> deployOtherVerticles(Vertx vertx, DeploymentOptions options){
+  private static Future<Void> deployOtherVerticles(Vertx vertx, DeploymentOptions options) {
     Future<String> httpVerticle = vertx.deployVerticle(new HttpVerticle(), options);
     Future<String> serviceVerticle = vertx.deployVerticle(new ServiceVerticle());
     Future<String> databaseVerticle = vertx.deployVerticle(new DataVerticle(), options);

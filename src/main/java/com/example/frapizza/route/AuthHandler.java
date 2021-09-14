@@ -6,7 +6,7 @@ import io.vertx.ext.web.handler.BasicAuthHandler;
 
 public interface AuthHandler {
 
-  static AuthenticationHandler createAuthHandler(Vertx vertx) {
+  static AuthenticationHandler createAuthenticationHandler(Vertx vertx) {
     return BasicAuthHandler.create(new AuthenticationProviderImpl(vertx));
   }
 }

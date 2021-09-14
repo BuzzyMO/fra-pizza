@@ -7,6 +7,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.VertxContextPRNG;
+import io.vertx.ext.auth.sqlclient.SqlAuthentication;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
@@ -24,11 +26,13 @@ public class UserDaoImpl implements UserDao {
   @Override
   public void save(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
     User user = userJson.mapTo(User.class);
-    String query = "INSERT INTO users(first_name, last_name, email, password, phone_number) " +
-      "VALUES ($1, $2, $3, $4, $5)";
+    String salt = VertxContextPRNG.current().nextString(32);
+    String encodedPassword = encode(salt, user.getPassword());
+    String query = "INSERT INTO users(first_name, last_name, email, password, password_salt, phone_number) " +
+      "VALUES ($1, $2, $3, $4, $5, $6)";
     pool.withTransaction(client -> client
         .preparedQuery(query)
-        .execute(Tuple.of(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getPhoneNumber())))
+        .execute(Tuple.of(user.getFirstName(), user.getLastName(), user.getEmail(), encodedPassword, salt, user.getPhoneNumber())))
       .onSuccess(rs -> {
         LOGGER.info("Transaction succeeded: user is created " + user.getEmail());
         resultHandler.handle(Future.succeededFuture());
@@ -93,5 +97,10 @@ public class UserDaoImpl implements UserDao {
         ex.printStackTrace();
         resultHandler.handle(Future.failedFuture(ex));
       });
+  }
+
+  private String encode(String salt, String secret) {
+    SqlAuthentication sqlAuth = SqlAuthentication.create(pool);
+    return sqlAuth.hash("pbkdf2", salt, secret);
   }
 }
