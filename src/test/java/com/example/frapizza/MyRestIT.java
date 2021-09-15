@@ -1,8 +1,6 @@
 package com.example.frapizza;
 
-import com.example.frapizza.verticle.DataVerticle;
-import com.example.frapizza.verticle.HttpVerticle;
-import com.example.frapizza.verticle.ServiceVerticle;
+import com.example.frapizza.verticle.*;
 import io.reactiverse.junit5.web.WebClientOptionsInject;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -25,7 +23,9 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import static io.reactiverse.junit5.web.TestRequest.*;
 
@@ -78,12 +78,19 @@ public class MyRestIT {
     );
   }
 
+  @SuppressWarnings("rawtypes")
   private static Future<Void> deployOtherVerticles(Vertx vertx, DeploymentOptions options) {
-    Future<String> httpVerticle = vertx.deployVerticle(new HttpVerticle(), options);
-    Future<String> serviceVerticle = vertx.deployVerticle(new ServiceVerticle());
-    Future<String> databaseVerticle = vertx.deployVerticle(new DataVerticle(), options);
+    List<Future> futures = new ArrayList<>();
+    futures.add(vertx.deployVerticle(new HttpVerticle(), options));
+    futures.add(vertx.deployVerticle(new AuthServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new IngredientServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new OrderServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new PizzaServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new PizzeriaServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new UserServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new DatabaseVerticle(), options));
 
-    return CompositeFuture.all(httpVerticle, serviceVerticle, databaseVerticle).mapEmpty();
+    return CompositeFuture.all(futures).mapEmpty();
   }
 
   @Test
@@ -171,11 +178,9 @@ public class MyRestIT {
   @Test
   void pizzeria_save(Vertx vertx, WebClient client, VertxTestContext testContext) {
     JsonObject testPizzeria = new JsonObject()
-      .put("city", "testCity")
-      .put("street", "testStreet")
-      .put("building", "42A")
-      .put("latitude", 49.78113)
-      .put("longitude", 36.44486);
+      .put("city", "Харьков")
+      .put("street", "Гагарина")
+      .put("building", "21");
 
     testRequest(client, HttpMethod.POST, "/api/pizzerias")
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
@@ -374,7 +379,6 @@ public class MyRestIT {
   @AfterAll
   static void stop() {
     postgres.stop();
-    System.out.println("postgres = " + postgres.isRunning());
   }
 
 }

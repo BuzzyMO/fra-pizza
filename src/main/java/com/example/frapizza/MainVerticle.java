@@ -1,8 +1,6 @@
 package com.example.frapizza;
 
-import com.example.frapizza.verticle.HttpVerticle;
-import com.example.frapizza.verticle.DataVerticle;
-import com.example.frapizza.verticle.ServiceVerticle;
+import com.example.frapizza.verticle.*;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -10,6 +8,9 @@ import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainVerticle extends AbstractVerticle {
   private static final Logger LOGGER = LoggerFactory.getLogger(MainVerticle.class.getName());
@@ -40,11 +41,18 @@ public class MainVerticle extends AbstractVerticle {
     return retriever.getConfig();
   }
 
+  @SuppressWarnings("rawtypes")
   private Future<Void> deployOtherVerticles(DeploymentOptions options){
-    Future<String> httpVerticle = vertx.deployVerticle(new HttpVerticle(), options);
-    Future<String> serviceVerticle = vertx.deployVerticle(new ServiceVerticle());
-    Future<String> databaseVerticle = vertx.deployVerticle(new DataVerticle(), options);
+    List<Future> futures = new ArrayList<>();
+    futures.add(vertx.deployVerticle(new HttpVerticle(), options));
+    futures.add(vertx.deployVerticle(new AuthServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new IngredientServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new OrderServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new PizzaServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new PizzeriaServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new UserServiceVerticle(), options));
+    futures.add(vertx.deployVerticle(new DatabaseVerticle(), options));
 
-    return CompositeFuture.all(httpVerticle, serviceVerticle, databaseVerticle).mapEmpty();
+    return CompositeFuture.all(futures).mapEmpty();
   }
 }

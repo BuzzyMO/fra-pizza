@@ -12,7 +12,7 @@ import io.vertx.sqlclient.PoolOptions;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 
-public class DataVerticle extends AbstractVerticle {
+public class DatabaseVerticle extends AbstractVerticle {
   private JsonObject props;
 
   @Override
