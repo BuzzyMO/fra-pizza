@@ -3,8 +3,11 @@ package com.example.frapizza.route;
 import com.example.frapizza.service.PizzaService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.AuthenticationHandler;
+import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +19,31 @@ public class PizzaRoute implements PizzaRouter {
 
   public PizzaRoute(Vertx vertx) {
     pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
+    AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
+    AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
+      .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
-    router.post().handler(this::save);
-    router.put("/:id").handler(this::update);
-    router.delete("/:id").handler(this::delete);
-    router.get("/authority/:authority").handler(this::readByAuthority);
-    router.get("/user").handler(this::readByUser);
-    router.get().handler(this::readAll);
+    router.post()
+      .handler(authHandler)
+      .handler(this::save);
+    router.put("/:id")
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::update);
+    router.delete("/:id")
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::delete);
+    router.get()
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
-    Long userId = routingContext.user().get("id");
+    Long userId = routingContext.user().principal().getLong("id");
+
     JsonObject pizzaIngredientsJson = routingContext.getBodyAsJson();
     pizzaIngredientsJson.getJsonObject("pizza").put("createdBy", userId);
 
@@ -41,7 +57,8 @@ public class PizzaRoute implements PizzaRouter {
       }
     });
   }
-  private void update(RoutingContext routingContext){
+
+  private void update(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     pizzaService.update(id, routingContext.getBodyAsJson(), ar -> {
@@ -54,7 +71,8 @@ public class PizzaRoute implements PizzaRouter {
       }
     });
   }
-  private void delete(RoutingContext routingContext){
+
+  private void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     pizzaService.delete(id, ar -> {
@@ -67,41 +85,8 @@ public class PizzaRoute implements PizzaRouter {
       }
     });
   }
-  private void readByAuthority(RoutingContext routingContext){
-    String authorityStr = routingContext.pathParam("authority");
-    Integer id = Integer.parseInt(authorityStr);
-    pizzaService.readByAuthority(id, ar -> {
-      if (ar.succeeded()) {
-        LOGGER.info("Pizzas is read by " + authorityStr);
-        routingContext.response()
-          .setStatusCode(200)
-          .putHeader("Content-Type", "application/json")
-          .end(ar.result().toBuffer());
-      } else {
-        LOGGER.error("Pizzas not read by authority " + ar.cause().getMessage());
-        routingContext.response().setStatusCode(400).end();
-      }
-    });
-  }
 
-
-  private void readByUser(RoutingContext routingContext){
-    Long userId = routingContext.user().get("id");
-    pizzaService.readByUser(userId, ar -> {
-      if (ar.succeeded()) {
-        LOGGER.info("Pizzas is read by user " + userId);
-        routingContext.response()
-          .setStatusCode(200)
-          .putHeader("Content-Type", "application/json")
-          .end(ar.result().toBuffer());
-      } else {
-        LOGGER.error("Pizzas not read by user " + ar.cause().getMessage());
-        routingContext.response().setStatusCode(400).end();
-      }
-    });
-  }
-
-  private void readAll(RoutingContext routingContext){
+  private void readAll(RoutingContext routingContext) {
     pizzaService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzas is read");
