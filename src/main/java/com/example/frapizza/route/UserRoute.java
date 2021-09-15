@@ -1,5 +1,6 @@
 package com.example.frapizza.route;
 
+import com.example.frapizza.service.OrderService;
 import com.example.frapizza.service.PizzaService;
 import com.example.frapizza.service.UserService;
 import io.vertx.core.Vertx;
@@ -18,10 +19,12 @@ public class UserRoute implements UserRouter {
   private final Router router;
   private final UserService userService;
   private final PizzaService pizzaService;
+  private final OrderService orderService;
 
   public UserRoute(Vertx vertx) {
     userService = UserService.createProxy(vertx, UserService.ADDRESS);
     pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
+    this.orderService = OrderService.createProxy(vertx, OrderService.ADDRESS);
     AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
     AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
       .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
@@ -42,6 +45,9 @@ public class UserRoute implements UserRouter {
     router.get("/pizzas")
       .handler(authHandler)
       .handler(this::readUserPizzas);
+    router.get("/orders")
+      .handler(authHandler)
+      .handler(this::readUserOrders);
     router.get()
       .handler(authHandler)
       .handler(authorizationAdminHandler)
@@ -100,6 +106,23 @@ public class UserRoute implements UserRouter {
           .end(ar.result().toBuffer());
       } else {
         LOGGER.error("Pizzas not read by user " + ar.cause().getMessage());
+        routingContext.response().setStatusCode(400).end();
+      }
+    });
+  }
+
+  private void readUserOrders(RoutingContext routingContext) {
+    Long userId = routingContext.user().principal().getLong("id");
+
+    orderService.readByCurrentUser(userId, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.info("Orders is read by current user");
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
+      } else {
+        LOGGER.error("Orders not read by user: " + ar.cause().getMessage());
         routingContext.response().setStatusCode(400).end();
       }
     });
