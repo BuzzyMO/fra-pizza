@@ -1,14 +1,22 @@
 package com.example.frapizza.entity;
 
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@DataObject(generateConverter = true)
 public class Ingredient {
   private Integer id;
   private String name;
   private BigDecimal cost;
+
+  public Ingredient(JsonObject json) {
+    this.id = json.getInteger("id");
+    this.name = json.getString("name");
+    this.cost = BigDecimal.valueOf(json.getLong("cost"));
+  }
 
   public Integer getId() {
     return id;
@@ -34,7 +42,7 @@ public class Ingredient {
     this.cost = cost;
   }
 
-  public JsonObject toJson(){
+  public JsonObject toJson() {
     return JsonObject.mapFrom(this);
   }
 

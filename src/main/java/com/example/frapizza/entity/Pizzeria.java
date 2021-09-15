@@ -1,7 +1,11 @@
 package com.example.frapizza.entity;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+
 import java.util.Objects;
 
+@DataObject(generateConverter = true)
 public class Pizzeria {
   private Integer id;
   private String city;
@@ -9,6 +13,15 @@ public class Pizzeria {
   private String building;
   private Float latitude;
   private Float longitude;
+
+  public Pizzeria(JsonObject json) {
+    this.id = json.getInteger("id");
+    this.city = json.getString("city");
+    this.street = json.getString("street");
+    this.building = json.getString("building");
+    this.latitude = json.getFloat("latitude");
+    this.longitude = json.getFloat("longitude");
+  }
 
   public Integer getId() {
     return id;
@@ -56,6 +69,10 @@ public class Pizzeria {
 
   public void setLongitude(Float longitude) {
     this.longitude = longitude;
+  }
+
+  public JsonObject toJson() {
+    return JsonObject.mapFrom(this);
   }
 
   @Override

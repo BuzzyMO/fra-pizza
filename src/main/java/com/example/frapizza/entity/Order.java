@@ -1,11 +1,21 @@
 package com.example.frapizza.entity;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+
 import java.util.Objects;
 
+@DataObject(generateConverter = true)
 public class Order {
   private Long id;
-  private Delivery delivery;
-  private Pizza pizza;
+  private Long deliveryId;
+  private Long pizzaId;
+
+  public Order(JsonObject json) {
+    this.id = json.getLong("id");
+    this.deliveryId = json.getLong("deliveryId");
+    this.pizzaId = json.getLong("pizzaId");
+  }
 
   public Long getId() {
     return id;
@@ -15,20 +25,24 @@ public class Order {
     this.id = id;
   }
 
-  public Delivery getDelivery() {
-    return delivery;
+  public Long getDeliveryId() {
+    return deliveryId;
   }
 
-  public void setDelivery(Delivery delivery) {
-    this.delivery = delivery;
+  public void setDeliveryId(Long deliveryId) {
+    this.deliveryId = deliveryId;
   }
 
-  public Pizza getPizza() {
-    return pizza;
+  public Long getPizzaId() {
+    return pizzaId;
   }
 
-  public void setPizza(Pizza pizza) {
-    this.pizza = pizza;
+  public void setPizzaId(Long pizzaId) {
+    this.pizzaId = pizzaId;
+  }
+
+  public JsonObject toJson() {
+    return JsonObject.mapFrom(this);
   }
 
   @Override
@@ -36,11 +50,11 @@ public class Order {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Order order = (Order) o;
-    return id.equals(order.id) && delivery.equals(order.delivery) && pizza.equals(order.pizza);
+    return Objects.equals(id, order.id) && Objects.equals(deliveryId, order.deliveryId) && Objects.equals(pizzaId, order.pizzaId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, delivery, pizza);
+    return Objects.hash(id, deliveryId, pizzaId);
   }
 }

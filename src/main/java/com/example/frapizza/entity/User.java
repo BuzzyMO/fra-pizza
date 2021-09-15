@@ -1,16 +1,33 @@
 package com.example.frapizza.entity;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
+@DataObject(generateConverter = true)
 public class User {
   private Long id;
   private String firstName;
   private String lastName;
   private String email;
   private String password;
+  private String passwordSalt;
   private String phoneNumber;
   private OffsetDateTime createdAt;
+
+  public User(JsonObject json) {
+    this.id = json.getLong("id");
+    this.firstName = json.getString("firstName");
+    this.lastName = json.getString("lastName");
+    this.email = json.getString("email");
+    this.password = json.getString("password");
+    this.passwordSalt = json.getString("passwordSalt");
+    this.phoneNumber = json.getString("phoneNumber");
+    this.createdAt = OffsetDateTime.ofInstant(json.getInstant("createdAt"), ZoneId.of("UTC"));
+  }
 
   public Long getId() {
     return id;
@@ -52,6 +69,14 @@ public class User {
     this.password = password;
   }
 
+  public String getPasswordSalt() {
+    return passwordSalt;
+  }
+
+  public void setPasswordSalt(String passwordSalt) {
+    this.passwordSalt = passwordSalt;
+  }
+
   public String getPhoneNumber() {
     return phoneNumber;
   }
@@ -66,6 +91,10 @@ public class User {
 
   public void setCreatedAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
+  }
+
+  public JsonObject toJson() {
+    return JsonObject.mapFrom(this);
   }
 
   @Override

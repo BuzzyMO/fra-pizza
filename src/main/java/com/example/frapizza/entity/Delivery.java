@@ -1,7 +1,11 @@
 package com.example.frapizza.entity;
 
+import io.vertx.codegen.annotations.DataObject;
+import io.vertx.core.json.JsonObject;
+
 import java.util.Objects;
 
+@DataObject(generateConverter = true)
 public class Delivery {
   private Long id;
   private Long createdBy;
@@ -12,6 +16,18 @@ public class Delivery {
   private String apartment;
   private Integer distanceM;
   private Integer expTime;
+
+  public Delivery(JsonObject json) {
+    this.id = json.getLong("id");
+    this.createdBy = json.getLong("createdBy");
+    this.pizzeriaFrom = json.getInteger("pizzeriaFrom");
+    this.city = json.getString("city");
+    this.street = json.getString("street");
+    this.building = json.getString("building");
+    this.apartment = json.getString("apartment");
+    this.distanceM = json.getInteger("distanceM");
+    this.expTime = json.getInteger("expTime");
+  }
 
   public Long getId() {
     return id;
@@ -83,6 +99,10 @@ public class Delivery {
 
   public void setExpTime(Integer expTime) {
     this.expTime = expTime;
+  }
+
+  public JsonObject toJson() {
+    return JsonObject.mapFrom(this);
   }
 
   @Override
