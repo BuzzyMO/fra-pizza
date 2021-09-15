@@ -1,6 +1,7 @@
 package com.example.frapizza.service.impl;
 
 import com.example.frapizza.dao.IngredientDao;
+import com.example.frapizza.entity.Ingredient;
 import com.example.frapizza.service.IngredientService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -18,12 +19,14 @@ public class IngredientServiceImpl implements IngredientService {
 
   @Override
   public void save(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
-    ingredientDao.save(ingredientJson, resultHandler);
+    Ingredient ingredient = new Ingredient(ingredientJson);
+    ingredientDao.save(ingredient, resultHandler);
   }
 
   @Override
   public void update(Integer id, JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
-    ingredientDao.update(id, ingredientJson, resultHandler);
+    Ingredient ingredient = new Ingredient(ingredientJson);
+    ingredientDao.update(id, ingredient, resultHandler);
   }
 
   @Override

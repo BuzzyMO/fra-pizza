@@ -2,6 +2,7 @@ package com.example.frapizza.service.impl;
 
 import com.example.frapizza.dao.OrderDao;
 import com.example.frapizza.dao.PizzeriaDao;
+import com.example.frapizza.entity.Delivery;
 import com.example.frapizza.entity.Pizzeria;
 import com.example.frapizza.service.OrderService;
 import io.vertx.core.*;
@@ -15,33 +16,42 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class OrderServiceImpl implements OrderService {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class.getName());
   private final PizzeriaDao pizzeriaDao;
   private final OrderDao orderDao;
   private final WebClient webClient;
+  private final JsonObject props;
   private JsonObject userLocation;
 
   public OrderServiceImpl(Vertx vertx) {
     this.pizzeriaDao = PizzeriaDao.createProxy(vertx, PizzeriaDao.ADDRESS);
     this.orderDao = OrderDao.createProxy(vertx, OrderDao.ADDRESS);
     this.webClient = WebClient.create(vertx);
+    this.props = vertx.getOrCreateContext().config();
   }
 
   @Override
   public void save(JsonObject deliveryPizzas, Handler<AsyncResult<Void>> resultHandler) {
-    JsonObject deliveryJson = deliveryPizzas.getJsonObject("delivery");
-    geocodeUserLocation(deliveryJson)
+    List<Integer> pizzaIds = deliveryPizzas.getJsonArray("pizzas")
+      .stream()
+      .map(e -> (Integer) e)
+      .collect(Collectors.toList());
+
+    Delivery delivery = new Delivery(deliveryPizzas.getJsonObject("delivery"));
+    geocodeUserLocation(delivery)
       .compose(this::matrixRequestBody)
       .compose(this::fetchDistanceMatrix)
       .onSuccess(distanceMatrix -> {
         JsonObject distAndDuration = getMinDistanceAndDuration(distanceMatrix);
-        deliveryJson.mergeIn(distAndDuration);
-        orderDao.save(deliveryPizzas, resultHandler);
+        delivery.setPizzeriaFrom(distAndDuration.getInteger("pizzeriaFrom"));
+        delivery.setDistanceM(distAndDuration.getInteger("distanceM"));
+        delivery.setExpTime(distAndDuration.getInteger("expTime"));
+        orderDao.save(delivery, pizzaIds, resultHandler);
       })
       .onFailure(ex -> resultHandler.handle(Future.failedFuture(ex)));
-
   }
 
   @Override
@@ -50,15 +60,20 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  public void readByCurrentUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler) {
+    orderDao.readByCurrentUser(userId, resultHandler);
+  }
+
+  @Override
   public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
     orderDao.readAll(resultHandler);
   }
 
-  private Future<Void> geocodeUserLocation(JsonObject deliveryJson) {
+  private Future<Void> geocodeUserLocation(Delivery delivery) {
     String requestUrl = "nominatim.openstreetmap.org";
-    String qParam = deliveryJson.getString("city") + " "
-      + deliveryJson.getString("street") + " "
-      + deliveryJson.getString("building");
+    String qParam = delivery.getCity() + " "
+      + delivery.getStreet() + " "
+      + delivery.getBuilding();
     return Future.future(promise -> httpGetGeocode(requestUrl, qParam, promise));
   }
 
@@ -110,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
   private Future<JsonObject> fetchDistanceMatrix(JsonObject matrixRequestBody) {
     return webClient
       .post(80, "api.openrouteservice.org", "/v2/matrix/driving-car")
-      .putHeader("Authorization", "5b3ce3597851110001cf6248c8f94ee33bef4dc1bf6ea676266fc9fa")
+      .putHeader("Authorization", props.getString("OPENROUTE_TOKEN"))
       .expect(ResponsePredicate.SC_SUCCESS)
       .sendJsonObject(matrixRequestBody)
       .map(HttpResponse::bodyAsJsonObject);
@@ -163,7 +178,7 @@ public class OrderServiceImpl implements OrderService {
         JsonArray jsonArray = ar.result();
         for (Object obj : jsonArray) {
           JsonObject jsonObject = (JsonObject) obj;
-          pizzerias.add(jsonObject.mapTo(Pizzeria.class));
+          pizzerias.add(new Pizzeria(jsonObject));
         }
         promise.complete(pizzerias);
       } else {

@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
@@ -22,8 +21,7 @@ public class IngredientDaoImpl implements IngredientDao {
   }
 
   @Override
-  public void save(JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
-    Ingredient ingredient = ingredientJson.mapTo(Ingredient.class);
+  public void save(Ingredient ingredient, Handler<AsyncResult<Void>> resultHandler) {
     String insertQuery = "INSERT INTO ingredients(name, cost) " +
       "VALUES ($1, $2) RETURNING id";
     pool.withTransaction(client -> client
@@ -41,8 +39,7 @@ public class IngredientDaoImpl implements IngredientDao {
   }
 
   @Override
-  public void update(Integer id, JsonObject ingredientJson, Handler<AsyncResult<Void>> resultHandler) {
-    Ingredient ingredient = ingredientJson.mapTo(Ingredient.class);
+  public void update(Integer id, Ingredient ingredient, Handler<AsyncResult<Void>> resultHandler) {
     String updateQuery = "UPDATE ingredients SET(name, cost) = ($1, $2) " +
       "WHERE id=$3";
     pool.withTransaction(client -> client

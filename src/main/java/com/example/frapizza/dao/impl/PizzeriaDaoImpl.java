@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
@@ -22,8 +21,7 @@ public class PizzeriaDaoImpl implements PizzeriaDao {
   }
 
   @Override
-  public void save(JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
-    Pizzeria pizzeria = pizzeriaJson.mapTo(Pizzeria.class);
+  public void save(Pizzeria pizzeria, Handler<AsyncResult<Void>> resultHandler) {
     String insertQuery = "INSERT INTO pizzerias(city, street, building, latitude, longitude) " +
       "VALUES ($1, $2, $3, $4, $5) RETURNING id";
     pool.withTransaction(client -> client
@@ -42,8 +40,7 @@ public class PizzeriaDaoImpl implements PizzeriaDao {
   }
 
   @Override
-  public void update(Integer id, JsonObject pizzeriaJson, Handler<AsyncResult<Void>> resultHandler) {
-    Pizzeria pizzeria = pizzeriaJson.mapTo(Pizzeria.class);
+  public void update(Integer id, Pizzeria pizzeria, Handler<AsyncResult<Void>> resultHandler) {
     String updateQuery = "UPDATE pizzerias SET(city, street, building, latitude, longitude) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
     pool.withTransaction(client -> client

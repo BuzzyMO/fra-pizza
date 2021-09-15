@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.VertxContextPRNG;
 import io.vertx.ext.auth.sqlclient.SqlAuthentication;
 import io.vertx.pgclient.PgPool;
@@ -24,8 +23,7 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public void save(JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
-    User user = userJson.mapTo(User.class);
+  public void save(User user, Handler<AsyncResult<Void>> resultHandler) {
     String salt = VertxContextPRNG.current().nextString(32);
     String encodedPassword = encode(salt, user.getPassword());
     String query = "INSERT INTO users(first_name, last_name, email, password, password_salt, phone_number) " +
@@ -44,8 +42,7 @@ public class UserDaoImpl implements UserDao {
   }
 
   @Override
-  public void update(Long id, JsonObject userJson, Handler<AsyncResult<Void>> resultHandler) {
-    User user = userJson.mapTo(User.class);
+  public void update(Long id, User user, Handler<AsyncResult<Void>> resultHandler) {
     String updateQuery = "UPDATE users SET(first_name, last_name, email, password, phone_number) " +
       "= ($1, $2, $3, $4, $5) WHERE id=$6";
     pool.withTransaction(client -> client

@@ -95,6 +95,7 @@ tasks.withType<Test> {
     "REDIS_URI",
     "redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0"
   )
+  environment("OPENROUTE_TOKEN", "5b3ce3597851110001cf6248c8f94ee33bef4dc1bf6ea676266fc9fa")
 
   useJUnitPlatform()
   testLogging {
@@ -114,6 +115,8 @@ tasks.withType<JavaExec> {
     "REDIS_URI",
     "redis://:MxsB0SSrcKJ7QWbt6mhJ6ASHzj382RTS@redis-11295.c257.us-east-1-3.ec2.cloud.redislabs.com:11295/0"
   )
+  environment("OPENROUTE_TOKEN", "5b3ce3597851110001cf6248c8f94ee33bef4dc1bf6ea676266fc9fa")
+
   args = listOf(
     "run",
     mainVerticleName,

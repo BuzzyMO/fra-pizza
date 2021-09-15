@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PizzaDaoImpl implements PizzaDao {
   private static final Logger LOGGER = LoggerFactory.getLogger(PizzaDaoImpl.class.getName());
@@ -28,13 +26,7 @@ public class PizzaDaoImpl implements PizzaDao {
   }
 
   @Override
-  public void save(JsonObject completePizza, Handler<AsyncResult<Void>> resultHandler) {
-    Pizza pizza = completePizza.getJsonObject("pizza").mapTo(Pizza.class);
-    List<Integer> ingredientIds = completePizza.getJsonArray("ingredients")
-      .stream()
-      .map(e -> (Integer) e)
-      .collect(Collectors.toList());
-
+  public void save(Pizza pizza, List<Integer> ingredientIds, Handler<AsyncResult<Void>> resultHandler) {
     String insertPizzaQuery = "INSERT INTO pizzas(name, description, created_by) " +
       "VALUES ($1, $2, $3) RETURNING id";
     pool.withTransaction(client -> client
@@ -54,8 +46,7 @@ public class PizzaDaoImpl implements PizzaDao {
   }
 
   @Override
-  public void update(Long id, JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
-    Pizza pizza = pizzaJson.mapTo(Pizza.class);
+  public void update(Long id, Pizza pizza, Handler<AsyncResult<Void>> resultHandler) {
     String updateQuery = "UPDATE pizzas SET(name, description, created_by, created_at) " +
       "= ($1, $2, $3, $4) WHERE id=$5";
     pool.withTransaction(client -> client

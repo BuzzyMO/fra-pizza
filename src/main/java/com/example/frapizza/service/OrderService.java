@@ -24,5 +24,6 @@ public interface OrderService {
 
   void save(JsonObject deliveryPizzas, Handler<AsyncResult<Void>> resultHandler);
   void delete(Long id, Handler<AsyncResult<Void>> resultHandler);
+  void readByCurrentUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler);
   void readAll(Handler<AsyncResult<JsonArray>> resultHandler);
 }

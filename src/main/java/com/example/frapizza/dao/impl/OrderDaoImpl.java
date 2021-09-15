@@ -6,7 +6,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrderDaoImpl implements OrderDao {
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderDaoImpl.class.getName());
@@ -28,14 +26,7 @@ public class OrderDaoImpl implements OrderDao {
   }
 
   @Override
-  public void save(JsonObject deliveryPizzas, Handler<AsyncResult<Void>> resultHandler) {
-
-    Delivery delivery = deliveryPizzas.getJsonObject("delivery").mapTo(Delivery.class);
-    List<Integer> pizzaIds = deliveryPizzas.getJsonArray("pizzas")
-      .stream()
-      .map(e -> (Integer) e)
-      .collect(Collectors.toList());
-
+  public void save(Delivery delivery, List<Integer> pizzaIds, Handler<AsyncResult<Void>> resultHandler) {
     String insertDeliveryQuery = "INSERT INTO deliveries(created_by, pizzeria_from, city, street, building, apartment, distance_m, exp_time) " +
       "VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id";
     pool.withTransaction(client -> client
@@ -68,6 +59,31 @@ public class OrderDaoImpl implements OrderDao {
       })
       .onFailure(ex -> {
         LOGGER.error("Transaction failed: order not deleted " + ex.getMessage());
+        resultHandler.handle(Future.failedFuture(ex));
+      });
+  }
+
+  @Override
+  public void readByCurrentUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler) {
+    String readAllQuery = "SELECT o.id as order_id, ordered_at, p.name as pizza_name, pizzeria_from, " +
+      "city, street, building, apartment, distance_m, exp_time " +
+      "FROM orders o " +
+      "INNER JOIN deliveries d on d.id = o.delivery_id " +
+      "INNER JOIN pizzas p on p.id = o.pizza_id " +
+      "WHERE d.created_by = $1";
+    pool.withTransaction(client -> client
+        .preparedQuery(readAllQuery)
+        .execute(Tuple.of(userId)))
+      .onSuccess(rs -> {
+        JsonArray jsonArray = new JsonArray();
+        for (Row row : rs) {
+          jsonArray.add(row.toJson());
+        }
+        LOGGER.info("Transaction succeeded: orders is read by user " + userId);
+        resultHandler.handle(Future.succeededFuture(jsonArray));
+      })
+      .onFailure(ex -> {
+        LOGGER.error("Transaction failed: orders not read: " + ex.getMessage());
         resultHandler.handle(Future.failedFuture(ex));
       });
   }
