@@ -119,6 +119,17 @@ public class MyRestIT {
       .map(HttpResponse::bodyAsJsonArray)
       .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
   }
+  @Test
+  void user_get_authorities(Vertx vertx, WebClient client, VertxTestContext testContext) {
+    testRequest(client, HttpMethod.GET, "/api/users/authority")
+      .with(requestHeader("Authorization", "Basic " + encodedCredentials))
+      .expect(
+        statusCode(200),
+        responseHeader("Content-Type", "application/json"))
+      .send(testContext)
+      .map(HttpResponse::bodyAsJsonArray)
+      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+  }
 
   @Test
   void user_update(Vertx vertx, WebClient client, VertxTestContext testContext) {
@@ -143,6 +154,18 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(statusCode(204))
       .send(testContext);
+  }
+
+  @Test
+  void get_user_pizzas(Vertx vertx, WebClient client, VertxTestContext testContext) {
+    testRequest(client, HttpMethod.GET, "/api/users/pizzas")
+      .with(requestHeader("Authorization", "Basic " + encodedCredentials))
+      .expect(
+        statusCode(200),
+        responseHeader("Content-Type", "application/json"))
+      .send(testContext)
+      .map(HttpResponse::bodyAsJsonArray)
+      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
   }
 
   @Test
@@ -259,6 +282,18 @@ public class MyRestIT {
   }
 
   @Test
+  void order_get_by_current_user(Vertx vertx, WebClient client, VertxTestContext testContext) {
+    testRequest(client, HttpMethod.GET, "/api/orders/user")
+      .with(requestHeader("Authorization", "Basic " + encodedCredentials))
+      .expect(
+        statusCode(200),
+        responseHeader("Content-Type", "application/json"))
+      .send(testContext)
+      .map(HttpResponse::bodyAsJsonArray)
+      .onSuccess(jsonArray -> Assertions.assertEquals(1, jsonArray.size()));
+  }
+
+  @Test
   void order_get_all(Vertx vertx, WebClient client, VertxTestContext testContext) {
     testRequest(client, HttpMethod.GET, "/api/orders")
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
@@ -289,29 +324,6 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(statusCode(201))
       .sendJson(testPizza, testContext);
-  }
-
-  @Test
-  void pizza_get_by_authority(Vertx vertx, WebClient client, VertxTestContext testContext) {
-    testRequest(client, HttpMethod.GET, "/api/pizzas/authority/1")
-      .expect(
-        statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
-  }
-
-  @Test
-  void pizza_get_by_user(Vertx vertx, WebClient client, VertxTestContext testContext) {
-    testRequest(client, HttpMethod.GET, "/api/pizzas/user")
-      .with(requestHeader("Authorization", "Basic " + encodedCredentials))
-      .expect(
-        statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
   }
 
   @Test
@@ -346,6 +358,17 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(statusCode(204))
       .send(testContext);
+  }
+
+  @Test
+  void get_authority_pizzas(Vertx vertx, WebClient client, VertxTestContext testContext) {
+    testRequest(client, HttpMethod.GET, "/api/authorities/1/pizzas")
+      .expect(
+        statusCode(200),
+        responseHeader("Content-Type", "application/json"))
+      .send(testContext)
+      .map(HttpResponse::bodyAsJsonArray)
+      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
   }
 
   @AfterAll

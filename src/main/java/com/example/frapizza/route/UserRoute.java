@@ -1,9 +1,14 @@
 package com.example.frapizza.route;
 
+import com.example.frapizza.service.PizzaService;
 import com.example.frapizza.service.UserService;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.AuthenticationHandler;
+import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +17,35 @@ public class UserRoute implements UserRouter {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserRoute.class.getName());
   private final Router router;
   private final UserService userService;
+  private final PizzaService pizzaService;
 
   public UserRoute(Vertx vertx) {
     userService = UserService.createProxy(vertx, UserService.ADDRESS);
+    pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
+    AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
+    AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
+      .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
     router.route().handler(BodyHandler.create());
     router.post().handler(this::save);
-    router.put("/:id").handler(this::update);
-    router.delete("/:id").handler(this::delete);
-    router.get().handler(this::readAll);
+    router.put("/:id")
+      .handler(authHandler)
+      .handler(this::update);
+    router.delete("/:id")
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::delete);
+    router.get("/authorities")
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::readUserAuthorities);
+    router.get("/pizzas")
+      .handler(authHandler)
+      .handler(this::readUserPizzas);
+    router.get()
+      .handler(authHandler)
+      .handler(authorizationAdminHandler)
+      .handler(this::readAll);
   }
 
   private void save(RoutingContext routingContext) {
@@ -61,6 +86,33 @@ public class UserRoute implements UserRouter {
         routingContext.response().setStatusCode(400).end();
       }
     });
+  }
+
+  private void readUserPizzas(RoutingContext routingContext) {
+    Long userId = routingContext.user().principal().getLong("id");
+
+    pizzaService.readByUser(userId, ar -> {
+      if (ar.succeeded()) {
+        LOGGER.info("Pizzas is read by user " + userId);
+        routingContext.response()
+          .setStatusCode(200)
+          .putHeader("Content-Type", "application/json")
+          .end(ar.result().toBuffer());
+      } else {
+        LOGGER.error("Pizzas not read by user " + ar.cause().getMessage());
+        routingContext.response().setStatusCode(400).end();
+      }
+    });
+  }
+
+  private void readUserAuthorities(RoutingContext routingContext) {
+    JsonArray roles = routingContext.user()
+      .principal()
+      .getJsonArray("roles");
+    routingContext.response()
+      .setStatusCode(200)
+      .putHeader("Content-Type", "application/json")
+      .end(roles.toBuffer());
   }
 
   private void readAll(RoutingContext routingContext) {
