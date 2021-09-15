@@ -20,7 +20,9 @@ public class Pizza {
     this.name = json.getString("name");
     this.description = json.getString("description");
     this.createdBy = json.getLong("createdBy");
-    this.createdAt = OffsetDateTime.ofInstant(json.getInstant("createdAt"), ZoneId.of("UTC"));
+    if (json.getInstant("createdAt") != null) {
+      this.createdAt = OffsetDateTime.ofInstant(json.getInstant("createdAt"), ZoneId.of("UTC"));
+    }
   }
 
   public Long getId() {

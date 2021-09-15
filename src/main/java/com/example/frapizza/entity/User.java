@@ -26,7 +26,9 @@ public class User {
     this.password = json.getString("password");
     this.passwordSalt = json.getString("passwordSalt");
     this.phoneNumber = json.getString("phoneNumber");
-    this.createdAt = OffsetDateTime.ofInstant(json.getInstant("createdAt"), ZoneId.of("UTC"));
+    if (json.getInstant("createdAt") != null) {
+      this.createdAt = OffsetDateTime.ofInstant(json.getInstant("createdAt"), ZoneId.of("UTC"));
+    }
   }
 
   public Long getId() {
