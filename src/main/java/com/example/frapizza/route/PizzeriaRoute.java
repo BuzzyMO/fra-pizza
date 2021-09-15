@@ -2,8 +2,11 @@ package com.example.frapizza.route;
 
 import com.example.frapizza.service.PizzeriaService;
 import io.vertx.core.Vertx;
+import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.AuthenticationHandler;
+import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +18,14 @@ public class PizzeriaRoute implements PizzeriaRouter {
 
   public PizzeriaRoute(Vertx vertx) {
     this.pizzeriaService = PizzeriaService.createProxy(vertx, PizzeriaService.ADDRESS);
+    AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
+    AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
+      .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
-    router.route().handler(BodyHandler.create());
+    router.route()
+      .handler(BodyHandler.create())
+      .handler(authHandler)
+      .handler(authorizationAdminHandler);
     router.post().handler(this::save);
     router.put("/:id").handler(this::update);
     router.delete("/:id").handler(this::delete);

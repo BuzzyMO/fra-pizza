@@ -57,8 +57,8 @@ CREATE TABLE pizzerias
   city      TEXT NOT NULL,
   street    TEXT NOT NULL,
   building  TEXT NOT NULL,
-  latitude  REAL NOT NULL,
-  longitude REAL NOT NULL
+  latitude  REAL,
+  longitude REAL
 );
 
 CREATE TABLE deliveries
