@@ -35,11 +35,11 @@ public class PizzaDaoImpl implements PizzaDao {
       .map(e -> (Integer) e)
       .collect(Collectors.toList());
 
-    String insertPizzaQuery = "INSERT INTO pizzas(name, created_by) " +
-      "VALUES ($1, $2) RETURNING id";
+    String insertPizzaQuery = "INSERT INTO pizzas(name, description, created_by) " +
+      "VALUES ($1, $2, $3) RETURNING id";
     pool.withTransaction(client -> client
         .preparedQuery(insertPizzaQuery)
-        .execute(Tuple.of(pizza.getName(), pizza.getCreatedBy()))
+        .execute(Tuple.of(pizza.getName(), pizza.getDescription(), pizza.getCreatedBy()))
         .map(rs -> rs.iterator().next().getInteger("id"))
         .compose(ar -> savePizzaIngredients(client, ar, ingredientIds))
         .map(rs -> rs.iterator().next().getInteger("pizza_id")))
@@ -56,11 +56,11 @@ public class PizzaDaoImpl implements PizzaDao {
   @Override
   public void update(Long id, JsonObject pizzaJson, Handler<AsyncResult<Void>> resultHandler) {
     Pizza pizza = pizzaJson.mapTo(Pizza.class);
-    String updateQuery = "UPDATE pizzas SET(name, created_by, created_at) " +
-      "= ($1, $2, $3) WHERE id=$4";
+    String updateQuery = "UPDATE pizzas SET(name, description, created_by, created_at) " +
+      "= ($1, $2, $3, $4) WHERE id=$5";
     pool.withTransaction(client -> client
         .preparedQuery(updateQuery)
-        .execute(Tuple.of(pizza.getName(), pizza.getCreatedBy(), pizza.getCreatedAt(), id)))
+        .execute(Tuple.of(pizza.getName(), pizza.getDescription(), pizza.getCreatedBy(), pizza.getCreatedAt(), id)))
       .onSuccess(rs -> {
         LOGGER.warn("Transaction succeeded: pizza is updated " + pizza.getId());
         resultHandler.handle(Future.succeededFuture());
@@ -89,12 +89,17 @@ public class PizzaDaoImpl implements PizzaDao {
 
   @Override
   public void readByAuthority(Integer authorityId, Handler<AsyncResult<JsonArray>> resultHandler) {
-    String readQuery = "SELECT pizzas.id, name FROM pizzas " +
+    String readQuery = "SELECT pizzas.id, pizzas.name as name, description, sum(i.cost) as cost " +
+      "FROM pizzas " +
       "INNER JOIN users u on u.id = pizzas.created_by " +
-      "INNER JOIN user_authorities ua on u.id = ua.user_id WHERE ua.authority_id=$1";
+      "INNER JOIN user_authorities ua on u.id = ua.user_id " +
+      "INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id " +
+      "INNER JOIN ingredients i on i.id = pi.ingredient_id " +
+      "WHERE ua.authority_id = $1 " +
+      "GROUP BY pizzas.id";
     pool.withTransaction(client -> client
         .preparedQuery(readQuery)
-        .execute())
+        .execute(Tuple.of(authorityId)))
       .onSuccess(rs -> {
         JsonArray jsonArray = new JsonArray();
         for (Row row : rs) {
@@ -111,8 +116,12 @@ public class PizzaDaoImpl implements PizzaDao {
 
   @Override
   public void readByUser(Long userId, Handler<AsyncResult<JsonArray>> resultHandler) {
-    String readQuery = "SELECT* FROM pizzas INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id " +
-      "INNER JOIN ingredients i on i.id = pi.ingredient_id WHERE created_by=$1";
+    String readQuery = "SELECT pizzas.id, pizzas.name as name, description, sum(i.cost) as cost " +
+      "FROM pizzas " +
+      "INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id " +
+      "INNER JOIN ingredients i on i.id = pi.ingredient_id " +
+      "WHERE created_by=$1 " +
+      "GROUP BY pizzas.id";
     pool.withTransaction(client -> client
         .preparedQuery(readQuery)
         .execute(Tuple.of(userId)))
@@ -132,7 +141,7 @@ public class PizzaDaoImpl implements PizzaDao {
 
   @Override
   public void readAll(Handler<AsyncResult<JsonArray>> resultHandler) {
-    String readAllQuery = "SELECT* FROM pizzas INNER JOIN pizza_ingredients pi on pizzas.id = pi.pizza_id INNER JOIN ingredients i on i.id = pi.ingredient_id";
+    String readAllQuery = "SELECT* FROM pizzas";
     pool.withTransaction(client -> client
         .preparedQuery(readAllQuery)
         .execute())
