@@ -4,6 +4,7 @@ import com.example.frapizza.route.*;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.http.CookieSameSite;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.SessionHandler;
@@ -25,8 +26,7 @@ public class HttpVerticle extends AbstractVerticle {
 
     Router router = Router.router(vertx);
     router.route()
-      .handler(corsHandler)
-      .handler(sessionHandler);
+      .handler(corsHandler);
 
     mountSubRouters(router, sessionHandler, sessionStore);
 
@@ -57,7 +57,7 @@ public class HttpVerticle extends AbstractVerticle {
   private CorsHandler corsConfig(){
     return CorsHandler.create()
       .addOrigin(config().getString("CORS_ORIGIN"))
-      .allowCredentials(true);
+      .allowCredentials(true).allowedMethod(HttpMethod.DELETE);
   }
 
   private void mountSubRouters(Router router, SessionHandler sessionHandler, SessionStore sessionStore){
@@ -67,12 +67,14 @@ public class HttpVerticle extends AbstractVerticle {
     Router orderRouter = OrderRouter.create(vertx);
     Router ingredientRouter = IngredientRouter.create(vertx);
     Router pizzeriaRouter = PizzeriaRouter.create(vertx);
+    Router authorityRouter = AuthorityRouter.create(vertx);
     router.mountSubRouter("/api/auth", authRouter);
     router.mountSubRouter("/api/users", userRouter);
     router.mountSubRouter("/api/pizzas", pizzaRouter);
     router.mountSubRouter("/api/orders", orderRouter);
     router.mountSubRouter("/api/ingredients", ingredientRouter);
     router.mountSubRouter("/api/pizzerias", pizzeriaRouter);
+    router.mountSubRouter("/api/authorities", authorityRouter);
   }
 
 }
