@@ -31,6 +31,9 @@ VALUES ('namePizza1', 2);
 INSERT INTO pizzas(name, created_by)
 VALUES ('namePizza2', 2);
 
+INSERT INTO pizza_ingredients(pizza_id, ingredient_id)
+VALUES (1, 1);
+
 INSERT INTO deliveries(created_by, pizzeria_from, city, street, building)
 VALUES (2, 1, 'Харьков', 'Целиноградская', 29);
 

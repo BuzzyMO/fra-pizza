@@ -121,21 +121,20 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
+
   @Test
   void user_get_authorities(Vertx vertx, WebClient client, VertxTestContext testContext) {
     testRequest(client, HttpMethod.GET, "/api/users/authority")
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -169,10 +168,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -194,10 +192,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -243,10 +240,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -292,10 +288,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertEquals(1, jsonArray.size()));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -304,10 +299,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -337,10 +331,9 @@ public class MyRestIT {
       .with(requestHeader("Authorization", "Basic " + encodedCredentials))
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @Test
@@ -370,10 +363,9 @@ public class MyRestIT {
     testRequest(client, HttpMethod.GET, "/api/authorities/1/pizzas")
       .expect(
         statusCode(200),
-        responseHeader("Content-Type", "application/json"))
-      .send(testContext)
-      .map(HttpResponse::bodyAsJsonArray)
-      .onSuccess(jsonArray -> Assertions.assertTrue(jsonArray.size() > 0));
+        responseHeader("Content-Type", "application/json"),
+        res -> Assertions.assertTrue(res.bodyAsJsonArray().size() > 0))
+      .send(testContext);
   }
 
   @AfterAll
