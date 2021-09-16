@@ -15,7 +15,9 @@ public class Ingredient {
   public Ingredient(JsonObject json) {
     this.id = json.getInteger("id");
     this.name = json.getString("name");
-    this.cost = BigDecimal.valueOf(json.getLong("cost"));
+    if(json.getString("cost") != null){
+      this.cost = new BigDecimal(json.getString("cost"));
+    }
   }
 
   public Integer getId() {

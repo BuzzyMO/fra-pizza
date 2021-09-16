@@ -19,8 +19,12 @@ public class Pizzeria {
     this.city = json.getString("city");
     this.street = json.getString("street");
     this.building = json.getString("building");
-    this.latitude = json.getFloat("latitude");
-    this.longitude = json.getFloat("longitude");
+    if(json.getFloat("latitude") != null){
+      this.latitude = json.getFloat("latitude");
+    }
+    if(json.getFloat("longitude") != null){
+      this.longitude = json.getFloat("longitude");
+    }
   }
 
   public Integer getId() {
