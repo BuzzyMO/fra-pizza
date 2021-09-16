@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
     JsonArray distances = distanceMatrix.getJsonArray("distances");
     int minDistIndex = getMinDistanceIndex(distances);
     JsonObject jsonResult = new JsonObject();
-    jsonResult.put("pizzeriaFrom", minDistIndex);
+    jsonResult.put("pizzeriaFrom", minDistIndex + 1);
     jsonResult.put("distanceM", distances.getJsonArray(minDistIndex).getInteger(0));
     jsonResult.put("expTime", durations.getJsonArray(minDistIndex).getInteger(0));
     return jsonResult;
