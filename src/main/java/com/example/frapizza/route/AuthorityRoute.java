@@ -19,7 +19,8 @@ public class AuthorityRoute implements AuthorityRouter {
       .handler(this::readAuthorityPizzas);
   }
 
-  private void readAuthorityPizzas(RoutingContext routingContext) {
+  @Override
+  public void readAuthorityPizzas(RoutingContext routingContext) {
     String authorityStr = routingContext.pathParam("id");
     Integer id = Integer.parseInt(authorityStr);
     pizzaService.readByAuthority(id, ar -> {

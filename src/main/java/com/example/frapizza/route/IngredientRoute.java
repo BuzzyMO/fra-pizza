@@ -37,7 +37,8 @@ public class IngredientRoute implements IngredientRouter {
     router.get().handler(this::readAll);
   }
 
-  private void save(RoutingContext routingContext) {
+  @Override
+  public void save(RoutingContext routingContext) {
     ingredientService.save(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Ingredient is created");
@@ -49,7 +50,8 @@ public class IngredientRoute implements IngredientRouter {
     });
   }
 
-  private void update(RoutingContext routingContext) {
+  @Override
+  public void update(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Integer id = Integer.parseInt(idStr);
     ingredientService.update(id, routingContext.getBodyAsJson(), ar -> {
@@ -63,7 +65,8 @@ public class IngredientRoute implements IngredientRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext) {
+  @Override
+  public void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Integer id = Integer.parseInt(idStr);
     ingredientService.delete(id, ar -> {
@@ -77,7 +80,8 @@ public class IngredientRoute implements IngredientRouter {
     });
   }
 
-  private void readAll(RoutingContext routingContext) {
+  @Override
+  public void readAll(RoutingContext routingContext) {
     ingredientService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Ingredients is read");

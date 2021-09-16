@@ -41,7 +41,8 @@ public class PizzaRoute implements PizzaRouter {
       .handler(this::readAll);
   }
 
-  private void save(RoutingContext routingContext) {
+  @Override
+  public void save(RoutingContext routingContext) {
     Long userId = routingContext.user().principal().getLong("id");
 
     JsonObject pizzaIngredientsJson = routingContext.getBodyAsJson();
@@ -58,7 +59,8 @@ public class PizzaRoute implements PizzaRouter {
     });
   }
 
-  private void update(RoutingContext routingContext) {
+  @Override
+  public void update(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     pizzaService.update(id, routingContext.getBodyAsJson(), ar -> {
@@ -72,7 +74,8 @@ public class PizzaRoute implements PizzaRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext) {
+  @Override
+  public void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     pizzaService.delete(id, ar -> {
@@ -86,7 +89,8 @@ public class PizzaRoute implements PizzaRouter {
     });
   }
 
-  private void readAll(RoutingContext routingContext) {
+  @Override
+  public void readAll(RoutingContext routingContext) {
     pizzaService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzas is read");

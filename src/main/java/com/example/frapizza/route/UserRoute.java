@@ -54,7 +54,8 @@ public class UserRoute implements UserRouter {
       .handler(this::readAll);
   }
 
-  private void save(RoutingContext routingContext) {
+  @Override
+  public void save(RoutingContext routingContext) {
     userService.save(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.info("User is created");
@@ -66,7 +67,8 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void update(RoutingContext routingContext) {
+  @Override
+  public void update(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     userService.update(id, routingContext.getBodyAsJson(), ar -> {
@@ -80,7 +82,8 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext) {
+  @Override
+  public void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     userService.delete(id, ar -> {
@@ -94,7 +97,8 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void readUserPizzas(RoutingContext routingContext) {
+  @Override
+  public void readUserPizzas(RoutingContext routingContext) {
     Long userId = routingContext.user().principal().getLong("id");
 
     pizzaService.readByUser(userId, ar -> {
@@ -111,7 +115,8 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void readUserOrders(RoutingContext routingContext) {
+  @Override
+  public void readUserOrders(RoutingContext routingContext) {
     Long userId = routingContext.user().principal().getLong("id");
 
     orderService.readByCurrentUser(userId, ar -> {
@@ -128,7 +133,8 @@ public class UserRoute implements UserRouter {
     });
   }
 
-  private void readUserAuthorities(RoutingContext routingContext) {
+  @Override
+  public void readUserAuthorities(RoutingContext routingContext) {
     JsonArray roles = routingContext.user()
       .principal()
       .getJsonArray("roles");
@@ -138,7 +144,8 @@ public class UserRoute implements UserRouter {
       .end(roles.toBuffer());
   }
 
-  private void readAll(RoutingContext routingContext) {
+  @Override
+  public void readAll(RoutingContext routingContext) {
     userService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Users is read");

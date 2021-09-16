@@ -36,7 +36,8 @@ public class OrderRoute implements OrderRouter {
       .handler(this::readAll);
   }
 
-  private void save(RoutingContext routingContext) {
+  @Override
+  public void save(RoutingContext routingContext) {
     Long userId = routingContext.user().principal().getLong("id");
 
     JsonObject deliveryPizzasJson = routingContext.getBodyAsJson();
@@ -53,7 +54,8 @@ public class OrderRoute implements OrderRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext) {
+  @Override
+  public void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Long id = Long.parseLong(idStr);
     orderService.delete(id, ar -> {
@@ -67,7 +69,8 @@ public class OrderRoute implements OrderRouter {
     });
   }
 
-  private void readAll(RoutingContext routingContext) {
+  @Override
+  public void readAll(RoutingContext routingContext) {
     orderService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Orders is read");

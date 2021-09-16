@@ -32,7 +32,8 @@ public class PizzeriaRoute implements PizzeriaRouter {
     router.get().handler(this::readAll);
   }
 
-  private void save(RoutingContext routingContext) {
+  @Override
+  public void save(RoutingContext routingContext) {
     pizzeriaService.save(routingContext.getBodyAsJson(), ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzeria is created");
@@ -44,7 +45,8 @@ public class PizzeriaRoute implements PizzeriaRouter {
     });
   }
 
-  private void update(RoutingContext routingContext) {
+  @Override
+  public void update(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Integer id = Integer.parseInt(idStr);
     pizzeriaService.update(id, routingContext.getBodyAsJson(), ar -> {
@@ -58,7 +60,8 @@ public class PizzeriaRoute implements PizzeriaRouter {
     });
   }
 
-  private void delete(RoutingContext routingContext) {
+  @Override
+  public void delete(RoutingContext routingContext) {
     String idStr = routingContext.pathParam("id");
     Integer id = Integer.parseInt(idStr);
     pizzeriaService.delete(id, ar -> {
@@ -72,7 +75,8 @@ public class PizzeriaRoute implements PizzeriaRouter {
     });
   }
 
-  private void readAll(RoutingContext routingContext) {
+  @Override
+  public void readAll(RoutingContext routingContext) {
     pizzeriaService.readAll(ar -> {
       if (ar.succeeded()) {
         LOGGER.info("Pizzerias is read");

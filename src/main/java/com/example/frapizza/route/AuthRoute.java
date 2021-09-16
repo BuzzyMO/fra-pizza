@@ -24,14 +24,16 @@ public class AuthRoute implements AuthRouter {
       .handler(ctx -> logout(ctx, sessionStore));
   }
 
-  private void auth(RoutingContext routingContext) {
+  @Override
+  public void auth(RoutingContext routingContext) {
     routingContext
       .response()
       .setStatusCode(200)
       .end();
   }
 
-  private void logout(RoutingContext routingContext, SessionStore sessionStore) {
+  @Override
+  public void logout(RoutingContext routingContext, SessionStore sessionStore) {
     routingContext.session().destroy();
     sessionStore
       .delete(routingContext.session().id())
