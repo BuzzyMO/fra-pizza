@@ -57,7 +57,9 @@ public class HttpVerticle extends AbstractVerticle {
   private CorsHandler corsConfig(){
     return CorsHandler.create()
       .addOrigin(config().getString("CORS_ORIGIN"))
-      .allowCredentials(true).allowedMethod(HttpMethod.DELETE);
+      .allowCredentials(true)
+      .allowedMethod(HttpMethod.DELETE)
+      .allowedMethod(HttpMethod.PUT);
   }
 
   private void mountSubRouters(Router router, SessionHandler sessionHandler, SessionStore sessionStore){
