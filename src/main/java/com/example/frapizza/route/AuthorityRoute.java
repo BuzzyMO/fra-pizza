@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AuthorityRoute implements AuthorityRouter {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AuthRoute.class.getName());
+  private static final Logger LOGGER = LoggerFactory.getLogger(AuthorityRoute.class.getName());
   private final Router router;
   private final PizzaService pizzaService;
 

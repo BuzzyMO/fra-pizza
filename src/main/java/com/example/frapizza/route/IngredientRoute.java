@@ -8,6 +8,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthenticationHandler;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,15 +17,16 @@ public class IngredientRoute implements IngredientRouter {
   private final Router router;
   private final IngredientService ingredientService;
 
-  public IngredientRoute(Vertx vertx) {
+  public IngredientRoute(Vertx vertx, SessionHandler sessionHandler) {
     this.ingredientService = IngredientService.createProxy(vertx, IngredientService.ADDRESS);
     AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
     AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
       .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
     router.route()
-      .handler(BodyHandler.create())
-      .handler(authHandler);
+      .handler(sessionHandler)
+      .handler(authHandler)
+      .handler(BodyHandler.create());
     router.post()
       .handler(authorizationAdminHandler)
       .handler(this::save);

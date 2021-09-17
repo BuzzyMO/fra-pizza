@@ -64,11 +64,11 @@ public class HttpVerticle extends AbstractVerticle {
 
   private void mountSubRouters(Router router, SessionHandler sessionHandler, SessionStore sessionStore){
     Router authRouter = AuthRouter.create(vertx, sessionHandler, sessionStore);
-    Router userRouter = UserRouter.create(vertx);
-    Router pizzaRouter = PizzaRouter.create(vertx);
-    Router orderRouter = OrderRouter.create(vertx);
-    Router ingredientRouter = IngredientRouter.create(vertx);
-    Router pizzeriaRouter = PizzeriaRouter.create(vertx);
+    Router userRouter = UserRouter.create(vertx, sessionHandler);
+    Router pizzaRouter = PizzaRouter.create(vertx, sessionHandler);
+    Router orderRouter = OrderRouter.create(vertx, sessionHandler);
+    Router ingredientRouter = IngredientRouter.create(vertx, sessionHandler);
+    Router pizzeriaRouter = PizzeriaRouter.create(vertx, sessionHandler);
     Router authorityRouter = AuthorityRouter.create(vertx);
     router.mountSubRouter("/api/auth", authRouter);
     router.mountSubRouter("/api/users", userRouter);

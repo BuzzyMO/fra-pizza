@@ -11,6 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthenticationHandler;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class UserRoute implements UserRouter {
   private final PizzaService pizzaService;
   private final OrderService orderService;
 
-  public UserRoute(Vertx vertx) {
+  public UserRoute(Vertx vertx, SessionHandler sessionHandler) {
     userService = UserService.createProxy(vertx, UserService.ADDRESS);
     pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
     this.orderService = OrderService.createProxy(vertx, OrderService.ADDRESS);
@@ -32,23 +33,29 @@ public class UserRoute implements UserRouter {
     router.route().handler(BodyHandler.create());
     router.post().handler(this::save);
     router.put("/:id")
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(this::update);
     router.delete("/:id")
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::delete);
     router.get("/authorities")
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::readUserAuthorities);
     router.get("/pizzas")
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(this::readUserPizzas);
     router.get("/orders")
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(this::readUserOrders);
     router.get()
+      .handler(sessionHandler)
       .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::readAll);

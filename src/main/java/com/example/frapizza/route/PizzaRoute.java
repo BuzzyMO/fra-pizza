@@ -9,6 +9,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthenticationHandler;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,26 +18,25 @@ public class PizzaRoute implements PizzaRouter {
   private final Router router;
   private final PizzaService pizzaService;
 
-  public PizzaRoute(Vertx vertx) {
+  public PizzaRoute(Vertx vertx, SessionHandler sessionHandler) {
     pizzaService = PizzaService.createProxy(vertx, PizzaService.ADDRESS);
     AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
     AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
       .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
-    router.route().handler(BodyHandler.create());
-    router.post()
+    router.route()
+      .handler(sessionHandler)
       .handler(authHandler)
+      .handler(BodyHandler.create());
+    router.post()
       .handler(this::save);
     router.put("/:id")
-      .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::update);
     router.delete("/:id")
-      .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::delete);
     router.get()
-      .handler(authHandler)
       .handler(authorizationAdminHandler)
       .handler(this::readAll);
   }

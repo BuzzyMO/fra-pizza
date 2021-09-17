@@ -21,6 +21,8 @@ public class AuthRoute implements AuthRouter {
       .handler(authHandler)
       .handler(this::auth);
     router.delete()
+      .handler(sessionHandler)
+      .handler(authHandler)
       .handler(ctx -> logout(ctx, sessionStore));
   }
 

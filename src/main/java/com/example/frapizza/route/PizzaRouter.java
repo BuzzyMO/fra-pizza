@@ -3,11 +3,12 @@ package com.example.frapizza.route;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.SessionHandler;
 
 public interface PizzaRouter {
 
-  static Router create(Vertx vertx) {
-    return new PizzaRoute(vertx).getRouter();
+  static Router create(Vertx vertx, SessionHandler sessionHandler) {
+    return new PizzaRoute(vertx, sessionHandler).getRouter();
   }
 
   void save(RoutingContext routingContext);

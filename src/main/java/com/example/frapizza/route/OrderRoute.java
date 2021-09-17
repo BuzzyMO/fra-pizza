@@ -9,6 +9,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthenticationHandler;
 import io.vertx.ext.web.handler.AuthorizationHandler;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,15 +18,16 @@ public class OrderRoute implements OrderRouter {
   private final Router router;
   private final OrderService orderService;
 
-  public OrderRoute(Vertx vertx) {
+  public OrderRoute(Vertx vertx, SessionHandler sessionHandler) {
     this.orderService = OrderService.createProxy(vertx, OrderService.ADDRESS);
     AuthenticationHandler authHandler = AuthHandler.createAuthenticationHandler(vertx);
     AuthorizationHandler authorizationAdminHandler = AuthorizationHandler
       .create(RoleBasedAuthorization.create("ROLE_ADMIN"));
     this.router = Router.router(vertx);
     router.route()
-      .handler(BodyHandler.create())
-      .handler(authHandler);
+      .handler(sessionHandler)
+      .handler(authHandler)
+      .handler(BodyHandler.create());
     router.post()
       .handler(this::save);
     router.delete("/:id")
