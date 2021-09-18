@@ -24,13 +24,20 @@ public class UserDaoImpl implements UserDao {
 
   @Override
   public void save(User user, Handler<AsyncResult<Void>> resultHandler) {
+    final int defaultRole = 0;
     String salt = VertxContextPRNG.current().nextString(32);
     String encodedPassword = encode(salt, user.getPassword());
-    String query = "INSERT INTO users(first_name, last_name, email, password, password_salt, phone_number) " +
-      "VALUES ($1, $2, $3, $4, $5, $6)";
+    String insertUserQuery = "INSERT INTO users(first_name, last_name, email, password, password_salt, phone_number) " +
+      "VALUES ($1, $2, $3, $4, $5, $6) RETURNING id";
+    String addUserRoleQuery = "INSERT INTO user_authorities(user_id, authority_id) VALUES ($1, $2)";
+
     pool.withTransaction(client -> client
-        .preparedQuery(query)
-        .execute(Tuple.of(user.getFirstName(), user.getLastName(), user.getEmail(), encodedPassword, salt, user.getPhoneNumber())))
+        .preparedQuery(insertUserQuery)
+        .execute(Tuple.of(user.getFirstName(), user.getLastName(), user.getEmail(), encodedPassword, salt, user.getPhoneNumber()))
+        .map(rs -> rs.iterator().next().getInteger("id"))
+        .compose(id -> client
+          .preparedQuery(addUserRoleQuery)
+          .execute(Tuple.of(id, defaultRole))))
       .onSuccess(rs -> {
         LOGGER.info("Transaction succeeded: user is created " + user.getEmail());
         resultHandler.handle(Future.succeededFuture());
