@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+
+  fra-pizza:
+    image: fra-pizza/vertx-java
+    build:
+      context: .
+    container_name: fra-pizza
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB}
+      DATASOURCE_PORT: 5432
+      DATASOURCE_HOST: postgres-db
+      DATASOURCE_DBNAME: ${POSTGRES_DB}
+      DATASOURCE_USERNAME: ${POSTGRES_USER}
+      DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      REDIS_URI: ${REDIS_URI}
+      OPENROUTE_TOKEN: ${OPENROUTE_TOKEN}
+
+    depends_on:
+      - postgres-db
+    ports:
+      - 8080:8080
+
+  postgres-db:
+    image: postgres
+    container_name: db-fra-pizza
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  db-data:
+    driver: local
+
